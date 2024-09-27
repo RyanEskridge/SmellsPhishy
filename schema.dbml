@@ -1,28 +1,41 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
 Table users {
-  id integer [primary key]
-  username varchar
-  role varchar [note: 'will we even have multiple roles?']
-  created_at timestamp
+  id integer [pk, unique]
+  username varchar [not null]
+  role varchar [default: 'user' , note: 'will we even have multiple roles?']
+  created_at timestamp [not null]
 }
 
 Table campaign {
-  id integer [primary key]
-  title varchar
-  notes text
-  user_id integer
-  status bool
-  created_at timestamp
+  id integer [pk, unique]
+  title varchar [default: 'Campaign Title']
+  notes text [default: null]
+  user_id integer [ref: < users.id]
+  status bool [default: false, note: 'Might need more than a bool']
+  created_at timestamp [not null]
 }
 
 Table test {
-  id integer [primary key]
-  title varchar
+  id integer [pk, unique]
+  title varchar [default: 'Test Name']
   content varchar [note: 'Email content']
   sender varchar [note: 'Sender address']
-  camp_id integer
-  status bool
-  created_at timestamp
+  camp_id integer [ref: < campaign.id]
+  status bool [default: false, note: 'Might need more than a bool']
+  created_at timestamp [not null]
 }
 
-Ref: campaign.user_id > users.id
-Ref: campaign.id < test.camp_id
+Table targets {
+  id integer [pk, unique]
+  name varchar [not null]
+  email_addr varchar [not null]
+}
+
+Table test_targets {
+  test_id integer [Ref: <> test.id]
+  target_id integer [Ref: <> targets.id]
+  clicked bool [default: false]
+  clicked_at timestamp [default: null]
+}
