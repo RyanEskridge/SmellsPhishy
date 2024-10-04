@@ -3,12 +3,12 @@ A simple cyber security tool that enables IT admins to test their users' susepti
 
 ### Technology Stack
 ---
-[Node.js](https://nodejs.org/en/about) - Runtime environment
-[Express.js](https://expressjs.com/) - Minimal JS app framework
-[Handlebars.js](https://handlebarsjs.com/guide/#what-is-handlebars) - JS templating language
-[Mailgun.js](https://documentation.mailgun.com/docs/mailgun/sdk/nodejs_sdk/) - Mail API
-[Clerk.js](https://clerk.com/docs/backend-requests/handling/nodejs) - Authentication
-[Cloudflare](https://www.cloudflare.com/) - DNS
+- [Node.js](https://nodejs.org/en/about) - Runtime environment
+- [Express.js](https://expressjs.com/) - Minimal JS app framework
+- [Handlebars.js](https://handlebarsjs.com/guide/#what-is-handlebars) - JS templating language
+- [Mailgun.js](https://documentation.mailgun.com/docs/mailgun/sdk/nodejs_sdk/) - Mail API
+- [Clerk.js](https://clerk.com/docs/backend-requests/handling/nodejs) - Authentication
+- [Cloudflare](https://www.cloudflare.com/) - DNS
 
 ### Access / Authentication
 
