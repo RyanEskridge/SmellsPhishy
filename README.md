@@ -1,5 +1,5 @@
 # Smells Phishy
-A simple cyber security tool that enables IT admins to test their users' suseptibility to Phising attacks.
+A simple cyber security tool that enables IT admins to test their users' suseptibility to Phishing attacks.
 
 ### Technology Stack
 ---
