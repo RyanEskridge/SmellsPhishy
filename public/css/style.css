@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+html, body, main, .sidebar, {
+    height: 100vh;
+}
+
+.cl-internal-b3fm6y {
+  background: #FF5722;
+}
+
+#brand {
+  font-size: 20px;
+}
+
+.brand-btn:hover {
+  border-color: #FF5722;
+  background: #FF5722;
+}
+
+.nav-icon {
+  color: #FF5722;
+}
+
+.btn-toggle {
+  width: 100%;
+}
+
+.btn-toggle i {
+  margin: 0 10px;
+}
+
+.btn-toggle i:first-of-type {
+  margin-left: 4px;
+}
+
+.btn-toggle i:not(:first-of-type) {
+  opacity: .4;
+  position: absolute;
+  left: 230px;
+}
+
+.btn-toggle-nav a{
+  opacity: .5;
+}
+
+.btn-toggle-nav a:hover {
+  opacity: 1;
+  transition: all 0.3s ease-in; 
+}
+
+#campaigns-collapse,
+#templates-collapse,
+#users-collapse {
+   transition: all 0.3s ease-in; 
+}
+
+.saira-condensed-thin {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 100;
+font-style: normal;
+}
+
+.mb-1 li {
+margin-left: 26px;
+}
+
+.saira-condensed-extralight {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 200;
+font-style: normal;
+}
+
+.saira-condensed-light {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 300;
+font-style: normal;
+}
+
+.saira-condensed-regular {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 400;
+font-style: normal;
+}
+
+.saira-condensed-medium {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 500;
+font-style: normal;
+}
+
+.saira-condensed-semibold {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 600;
+font-style: normal;
+}
+
+.saira-condensed-bold {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 700;
+font-style: normal;
+}
+
+.saira-condensed-extrabold {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 800;
+font-style: normal;
+}
+
+.saira-condensed-black {
+font-family: "Saira Condensed", sans-serif;
+font-weight: 900;
+font-style: normal;
+}

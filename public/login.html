@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login - Smells Phishy</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+        html, body {
+            background: #191919;
+            font-family: "Noto Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: normal;
+            font-style: normal;
+        }
+        #sign-in {
+            margin: 30px auto;
+        }
+        .cl-internal-1fsg6zy,
+        .cl-internal-1fsg6zy:hover,
+        .cl-internal-b3fm6y {
+          background-color: #FF5722;
+        }
+        .cl-internal-15amzqo,
+        .cl-internal-15amzqo:hover {
+          color: #FF5722;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <!-- Initialize Clerk with your
+    Clerk Publishable key and Frontend API URL -->
+    <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_test_Y2hhbXBpb24tcGVnYXN1cy00OC5jbGVyay5hY2NvdW50cy5kZXYk"
+    src="https://champion-pegasus-48.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    type="text/javascript"
+    ></script>
+
+    <script>
+    window.addEventListener('load', async function () {
+        await Clerk.load()
+
+        if (Clerk.user) {
+            window.location.replace("/");
+        } else {
+        document.getElementById('app').innerHTML = `<div id="sign-in"></div>`
+
+        const signInDiv = document.getElementById('sign-in')
+        
+        Clerk.mountSignIn(signInDiv)
+        }
+    })
+    </script>
+  </body>
+</html>
