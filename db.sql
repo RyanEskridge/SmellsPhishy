@@ -1,12 +1,19 @@
 -- SQL dump generated using DBML (dbml.dbdiagram.io)
 -- Database: PostgreSQL
--- Generated at: 2024-09-30T14:54:55.535Z
+-- Generated at: 2024-10-16T21:11:46.141Z
 
 CREATE TABLE "users" (
   "id" integer UNIQUE PRIMARY KEY,
   "username" varchar NOT NULL,
   "role" varchar DEFAULT 'user',
   "created_at" timestamp NOT NULL
+);
+
+CREATE TABLE "email_templates" (
+  "id" integer UNIQUE PRIMARY KEY,
+  "name" varchar,
+  "subject" varchar,
+  "body" TEXT
 );
 
 CREATE TABLE "campaign" (
@@ -25,7 +32,8 @@ CREATE TABLE "test" (
   "sender" varchar,
   "camp_id" integer,
   "status" bool DEFAULT false,
-  "created_at" timestamp NOT NULL
+  "created_at" timestamp NOT NULL,
+  "template_id" integer
 );
 
 CREATE TABLE "targets" (
@@ -37,8 +45,7 @@ CREATE TABLE "targets" (
 CREATE TABLE "test_targets" (
   "test_id" integer,
   "target_id" integer,
-  "clicked" bool DEFAULT false,
-  "clicked_at" timestamp DEFAULT null
+  "clicked" timestamp DEFAULT null
 );
 
 COMMENT ON COLUMN "users"."role" IS 'will we even have multiple roles?';
@@ -54,6 +61,8 @@ COMMENT ON COLUMN "test"."status" IS 'Might need more than a bool';
 ALTER TABLE "users" ADD FOREIGN KEY ("id") REFERENCES "campaign" ("user_id");
 
 ALTER TABLE "campaign" ADD FOREIGN KEY ("id") REFERENCES "test" ("camp_id");
+
+ALTER TABLE "test" ADD FOREIGN KEY ("template_id") REFERENCES "email_templates" ("id");
 
 CREATE TABLE "test_test_targets" (
   "test_id" integer,

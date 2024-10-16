@@ -8,6 +8,13 @@ Table users {
   created_at timestamp [not null]
 }
 
+Table email_templates {
+  id integer [pk, unique]
+  name varchar
+  subject varchar
+  body TEXT
+}
+
 Table campaign {
   id integer [pk, unique]
   title varchar [default: 'Campaign Title']
@@ -25,6 +32,7 @@ Table test {
   camp_id integer [ref: < campaign.id]
   status bool [default: false, note: 'Might need more than a bool']
   created_at timestamp [not null]
+  template_id integer [ref: > email_templates.id]
 }
 
 Table targets {
@@ -36,6 +44,5 @@ Table targets {
 Table test_targets {
   test_id integer [Ref: <> test.id]
   target_id integer [Ref: <> targets.id]
-  clicked bool [default: false]
-  clicked_at timestamp [default: null]
+  clicked timestamp [default: null]
 }
