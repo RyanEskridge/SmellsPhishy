@@ -1,0 +1,13 @@
+Dear {target.name},
+
+Your {company.name} account has been locked due to multiple failed login attempts. To regain access, please reset your password by clicking the following link:
+
+{link}
+
+If you did not attempt to log in, please contact us immediately.
+
+Thank you for your cooperation.
+
+Best regards,  
+IT Security Team
+{company.name}

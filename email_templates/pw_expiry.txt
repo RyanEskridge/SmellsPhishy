@@ -1,0 +1,11 @@
+Dear {target.name},
+
+Your account password is set to expire in the next 24 hours. To continue accessing your account without interruption, please reset your password by clicking the link below:
+
+{link}
+
+Please do not delay, as failure to update your password may result in restricted access to your account.
+
+Thank you,  
+IT Security Team
+{company.name}
