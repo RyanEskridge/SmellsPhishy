@@ -1,0 +1,1 @@
+Temp Storage for email templates. These should be moved to the db.
