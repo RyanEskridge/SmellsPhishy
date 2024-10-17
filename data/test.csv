@@ -1,0 +1,4 @@
+firstName,lastName,email,jobTitle,department,supervisor
+Jane,Doe,jane.doe@mediocresolutions.org,Manager,Marketing,Susan Lee
+Bob,Ross,bob.ross@mediocresolutions.org,Employee,Sales,Dan Brown
+Sarah,Connor,sarah.connor@mediocresolutions.org,Director,Human Resources,John Reese

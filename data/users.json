@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1893749873298741",
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@mediocresolutions.org",
+    "jobTitle": "Employee",
+    "department": "Sales",
+    "supervisor": "Dan Brown",
+    "dateAdded": "2024-10-14T10:00:00Z"
+  },
+  {
+    "id": "1893749873298752",
+    "firstName": "Jack",
+    "lastName": "Smith",
+    "email": "jack.smith@mediocresolutions.org",
+    "jobTitle": "Employee",
+    "department": "Human Resources",
+    "supervisor": "Fionna Brown",
+    "dateAdded": "2024-10-14T10:00:00Z"
+  },
+  {
+    "id": "1893749873298763",
+    "firstName": "Kim",
+    "lastName": "Smith",
+    "email": "kim.smith@mediocresolutions.org",
+    "jobTitle": "Employee",
+    "department": "Accounting",
+    "supervisor": "James Blue",
+    "dateAdded": "2024-10-14T10:00:00Z"
+  }
+]
