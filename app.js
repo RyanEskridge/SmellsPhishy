@@ -7,6 +7,9 @@ const mailHandler = require('./helpers/mailHandler');
 const { ClerkExpressWithAuth } = require('@clerk/clerk-sdk-node');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
 
+const sequelize = require('./config/database');
+const EmailTemplate = require('./models/EmailTemplate');
+
 const app = express();
 
 require('dotenv').config();
@@ -49,6 +52,9 @@ const templatesRouter = require('./routes/templates');
 const usersRouter = require('./routes/users');
 const clickRouter = require('./routes/click');
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.use('/campaigns', campaignsRouter);
 app.use('/templates', templatesRouter);
 app.use('/users', usersRouter);
@@ -77,6 +83,15 @@ app.use(express.json());
 app.post('/send-email', (req, res) => {
   mailHandler.sendMail(req, res);
 });
+
+// Synchronize all models with the database
+sequelize.sync({ force: false }) // IMPORTAINT!!! Set to false in production!!!
+  .then(() => {
+    console.log('Database synced successfully');
+  })
+  .catch((err) => {
+    console.error('Error syncing database:', err);
+  });
 
 // App start
 
