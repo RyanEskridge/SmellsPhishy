@@ -12,7 +12,13 @@ html, body, main, .sidebar, {
   font-size: 20px;
 }
 
+.brand-text {
+  color: #FF5722;
+}
+
+.brand-btn,
 .brand-btn:hover {
+  color: #FFFFFF;
   border-color: #FF5722;
   background: #FF5722;
 }
@@ -110,4 +116,22 @@ font-style: normal;
 font-family: "Saira Condensed", sans-serif;
 font-weight: 900;
 font-style: normal;
+}
+
+.nav-tabs .nav-link {
+  color: #424242;
+}
+
+.name-cell {
+	max-width: 100px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.email-addr {
+	max-width: 120px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

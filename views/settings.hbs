@@ -2,73 +2,55 @@
 <p class="mx-2">{{description}}</p>
 
 <style>
-    .toast {
-        transition: all 0.3s ease-in; 
-        max-height: 100px;
-        position: absolute;
-        bottom: 15px;
-        right: 15px;
-    }
-    .toast i {
-        margin-right: 5px;
-        color: #FF5722;
-    }
+	.toast { transition: all 0.3s ease-in; max-height: 100px; position: absolute;
+	bottom: 15px; right: 15px; } .toast i { margin-right: 5px; color: #FF5722; }
 </style>
 
 <div class="container my-5">
-    <div class="row">
-        <div class="col-6">
-        <h4>Mailgun API Key</h4>
-            <div class="input-group mt-3 mb-3">
-                <input type="password" id="keyHolder" class="form-control" placeholder="Mailgun API Key" aria-label="Mailgun API Key" aria-describedby="mg-api-key">
-                <span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>    
-            </div> 
-            <div class="d-flex justify-content-start">
-                <button id="toastbtn" type="button" class="btn btn-dark">Save</button>
-            </div>
-        </div>
-        </div>          
-    </div>
+	<div class="row">
+		<div class="col-6">
+			<h4>Mailgun API Key</h4>
+			<div class="input-group mt-3 mb-3">
+				<input type="password" id="keyHolder" class="form-control" placeholder="Mailgun API Key" aria-label="Mailgun API Key" aria-describedby="mg-api-key" />
+				<span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>
+			</div>
+			<div class="d-flex justify-content-start">
+				<button id="toastbtn" type="button" class="btn btn-dark">Save</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
-  <div class="d-flex">
-    <div class="toast-body">
-      <i class="bi bi-check-square"></i> Your changes have been saved.
-    </div>
-    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-  </div>
+	<div class="d-flex">
+		<div class="toast-body">
+			<i class="bi bi-check-square"></i>
+			Your changes have been saved.
+		</div>
+		<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+	</div>
 </div>
 <script>
-    const fakeKey = '6a53edf24a8d7698710adc470115b90'
-    const visibility = document.getElementById("mg-api-key");
-    const keyHolder = document.getElementById("keyHolder");
-    keyHolder.value = fakeKey;
-
-    const eyeOpen = '<i class="bi bi-eye"></i>';
-    const eyeClosed = '<i class="bi bi-eye-slash"></i>';
-
-    let hidden = true;
-
-    visibility.addEventListener('click', function() {
-        if (!hidden) { 
-            hidden = true;
-            visibility.innerHTML = eyeOpen;
-            keyHolder.type = 'password';
-        }
-        else { 
-            hidden = false;
-            visibility.innerHTML = eyeClosed;
-            keyHolder.type = 'text';
-        }
-});
-
-
-document.getElementById("toastbtn").onclick = function() {
-  var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-  var toastList = toastElList.map(function(toastEl) {
-    return new bootstrap.Toast(toastEl)
-  })
-  toastList.forEach(toast => toast.show()) 
-}
+	const fakeKey = '6a53edf24a8d7698710adc470115b90'; 
+  const visibility = document.getElementById("mg-api-key"); 
+  const keyHolder = document.getElementById("keyHolder"); keyHolder.value = fakeKey; 
+  const eyeOpen = '<i class="bi bi-eye"></i>'; 
+  const eyeClosed = '<i class="bi bi-eye-slash"></i>'; 
+  let hidden = true; 
+  visibility.addEventListener('click', function() { 
+  if (!hidden) { 
+    hidden = true; visibility.innerHTML = eyeOpen;
+	  keyHolder.type = 'password'; 
+  } 
+  else { 
+    hidden = false; visibility.innerHTML =
+	  eyeClosed; keyHolder.type = 'text'; 
+  } });
+	document.getElementById("toastbtn").onclick = function() { 
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function(toastEl) { 
+    return new bootstrap.Toast(toastEl); 
+    });
+	  toastList.forEach(toast => toast.show()); 
+  }
 </script>

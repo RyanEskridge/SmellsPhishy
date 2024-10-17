@@ -1,9 +1,9 @@
-<h1 class="mx-2">{{title}}</h1>
-<p class="mx-2">{{description}}</p>
+<h1 class="">{{title}}</h1>
+<p class="">{{description}}</p>
 
 <div class="container-fluid mt-4">
-    <div class="row p-4">
-    <div class="col-8">
+    <div class="row">
+    <div class="col-8 px-0">
     <style>
     .nav-tabs .nav-link {
         color: #424242;
@@ -23,16 +23,16 @@
     <div class="tab-content border border-light-subtle bg-white" id="myTabContent">
         <div class="tab-pane fade show active" id="file-upload" role="tabpanel" aria-labelledby="file-tab">
             <div class="tab-pane fade show active" id="file-upload" role="tabpanel" aria-labelledby="file-tab">
-                <form action="/templates/upload" method="POST" enctype="multipart/form-data"> 
+                <form class="p-4" action="/templates/upload" method="POST" enctype="multipart/form-data"> 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Template Name</span>
                         <input type="text" class="form-control" id="templateName" name="name" required>
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-4">
                         <span class="input-group-text">Subject</span>
                         <input type="text" class="form-control" id="templateSubject" name="subject" required>
                     </div>
-                    <div class="mb-3 p-4">
+                    <div class="mb-4">
                         <label for="formFile" class="form-label">Upload <code style="color: #FF5722;">.txt</code> file with template data</label>
                         <input class="form-control" type="file" id="formFile" name="templateFile" accept=".txt" required>
                     </div>
