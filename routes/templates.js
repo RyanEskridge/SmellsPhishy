@@ -8,7 +8,6 @@ const EmailTemplate = require('../models/EmailTemplate');
 // Set up multer to handle file uploads
 const upload = multer({ dest: 'uploads/' });
 
-// Route to render all templates
 router.get('/', async (req, res) => {
     try {
         const templates = await EmailTemplate.findAll();
@@ -26,7 +25,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Route to create a new template
 router.get('/new', async (req, res) => {
     const templates = await EmailTemplate.findAll();
 
@@ -47,7 +45,6 @@ router.get('/new', async (req, res) => {
 router.post('/upload', upload.single('templateFile'), async (req, res) => {
     const { name, subject, body } = req.body;
 
-    // If a file is uploaded, use the file's content for the body
     if (req.file) {
         const filePath = req.file.path;
 
@@ -58,11 +55,9 @@ router.post('/upload', upload.single('templateFile'), async (req, res) => {
                 return res.status(500).send('Server Error');
             }
 
-            // Use the file content as the body
             const fileBody = data.trim();
 
             try {
-                // Create a new template in the database using file content
                 await EmailTemplate.create({ name, subject, body: fileBody });
 
                 // Delete the file after processing
@@ -77,9 +72,7 @@ router.post('/upload', upload.single('templateFile'), async (req, res) => {
             }
         });
     } else if (body) {
-        // If no file is uploaded, use the text entered in the textarea
         try {
-            // Create a new template in the database using the text body
             await EmailTemplate.create({ name, subject, body });
 
             res.redirect('/templates');
@@ -88,7 +81,6 @@ router.post('/upload', upload.single('templateFile'), async (req, res) => {
             res.status(500).send('Server Error');
         }
     } else {
-        // If neither file nor text body is provided, return an error
         return res.status(400).send('You must either upload a file or enter the template body.');
     }
 });
@@ -103,7 +95,6 @@ router.get('/edit/:id', async (req, res) => {
             return res.status(404).send('Template not found');
         }
 
-        // Render the view and pass the template to the view
         res.render('edit_template', {
             title: 'Edit Template',
             description: 'Update the template details below.',
@@ -120,17 +111,14 @@ router.post('/update/:id', async (req, res) => {
     const { name, subject, body } = req.body;
 
     try {
-        // Find the template by ID
         const template = await EmailTemplate.findByPk(templateId);
 
         if (!template) {
             return res.status(404).send('Template not found');
         }
 
-        // Update the template with the new values
         await template.update({ name, subject, body });
 
-        // Redirect back to the template list page after updating
         res.redirect('/templates');
     } catch (error) {
         console.error('Error updating template:', error);

@@ -1,0 +1,24 @@
+<h1 class="mx-2">{{title}}</h1>
+<p class="mx-2">{{description}}</p>
+
+<div class="alert alert-info mx-2">
+    <strong>Template ID:</strong> {{template.id}}
+</div>
+
+<form class="p-4" action="/templates/update/{{template.id}}" method="POST">
+    <div class="input-group mb-3">
+        <span class="input-group-text">Template Name</span>
+        <input type="text" class="form-control" id="templateName" name="name" value="{{template.name}}" required>
+    </div>
+    <div class="input-group mb-3">
+        <span class="input-group-text">Subject</span>
+        <input type="text" class="form-control" id="templateSubject" name="subject" value="{{template.subject}}" required>
+    </div>
+    <div class="mb-3">
+        <label for="templateBody" class="form-label">Template Body</label>
+        <textarea class="form-control" id="templateBody" name="body" rows="10" required>{{template.body}}</textarea>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-dark" style="width: 180px;">Update Template</button>
+    </div>
+</form>
