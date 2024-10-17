@@ -3,33 +3,33 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
+const dataFromFile = require('../helpers/dataFromFile');
 const numHelper = require('../helpers/randomNumber');
 const randomNumber = numHelper.generateRandomNumber();
 
 const usersFile = path.join(__dirname, '../data/users.json');
-const listsFile = path.join(__dirname, '../data/list.json');
 
-const readUsersFromFile = (filePath, callback) => {
-  fs.readFile(filePath, 'utf8', (err, data) => {
+const readUsersFromFile = (callback) => {
+  fs.readFile(usersFile, 'utf8', (err, data) => {
     if (err) return callback(err, null);
     try {
-      const objects = JSON.parse(data || '[]'); 
-      return callback(null, objects);
+      const users = JSON.parse(data || '[]'); 
+      return callback(null, users);
     } catch (parseError) {
       return callback(parseError, null); 
     }
   });
 };
 
-const writeUsersToFile = (filePath, objects, callback) => {
-  fs.writeFile(filePath, JSON.stringify(objects, null, 2), (err) => {
+const writeUsersToFile = (users, callback) => {
+  fs.writeFile(usersFile, JSON.stringify(users, null, 2), (err) => {
     if (err) return callback(err);
     callback(null);
   });
 };
 
 router.get('/', (req, res) => {
-  readUsersFromFile(usersFile, (err, users) => {
+  readUsersFromFile((err, users) => {
     let errorMessage = err
       ? 'Unable to load user data. Please try again later.'
       : null;
@@ -43,17 +43,17 @@ router.get('/', (req, res) => {
 });
 
 router.get('/lists', (req, res) => {
-  readUsersFromFile(listsFile, (err, users) => {
+  dataFromFile((err, lists) => {
     let errorMessage = err
-      ? 'Unable to load list data. Please try again later.'
+      ? 'Unable to load lists data. Please try again later.'
       : null;
-      res.render('user_lists', {
-        lists: lists || [],
-        title: 'User lists',
-        description: 'Browse all lists.',
-        errorMessage
-      });
-  });
+    res.render('user_lists', {
+      lists: lists || [],
+      title: 'Users',
+      description: 'Browse all users.',
+      errorMessage
+    });
+  }, 'lists.json');
 });
 
 router.post('/add', (req, res) => {
@@ -73,12 +73,12 @@ router.post('/add', (req, res) => {
     dateAdded
   };
 
-  readUsersFromFile(usersFile, (err, users) => {
+  readUsersFromFile((err, users) => {
     if (err) return res.status(500).send('Server error');
 
     users.push(newUser);
 
-    writeUsersToFile(usersFile, users, (err) => {
+    writeUsersToFile(users, (err) => {
       if (err) return res.status(500).send('Server error');
       res.redirect('/users');
     });
@@ -88,7 +88,7 @@ router.post('/add', (req, res) => {
 router.delete('/delete/:id', (req, res) => {
   const userId = req.params.id;
 
-  readUsersFromFile(usersFile, (err, users) => {
+  readUsersFromFile((err, users) => {
     if (err)
       return res.status(500).json({ message: 'Failed to read users data.' });
 
@@ -98,7 +98,7 @@ router.delete('/delete/:id', (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    writeUsersToFile(usersFile, updatedUsers, (err) => {
+    writeUsersToFile(updatedUsers, (err) => {
       if (err)
         return res
           .status(500)
@@ -111,7 +111,7 @@ router.delete('/delete/:id', (req, res) => {
 router.get('/:id', (req, res) => {
   const userId = req.params.id;
 
-  readUsersFromFile(usersFile, (err, users) => {
+  readUsersFromFile((err, users) => {
     if (err)
       return res.status(500).json({ message: 'Failed to load users data.' });
 
@@ -125,18 +125,17 @@ router.get('/:id', (req, res) => {
 router.put('/:id', (req, res) => {
   const userId = req.params.id;
 
-  readUsersFromFile(usersFile, (err, users) => {
+  readUsersFromFile((err, users) => {
     if (err)
       return res.status(500).json({ message: 'Failed to load users data.' });
 
     const userIndex = users.findIndex((user) => user.id === userId);
-
     if (userIndex === -1)
       return res.status(404).json({ message: 'User not found.' });
 
     users[userIndex] = { ...users[userIndex], ...req.body };
 
-    writeUsersToFile(usersFile, users, (err) => {
+    writeUsersToFile(users, (err) => {
       if (err)
         return res
           .status(500)
