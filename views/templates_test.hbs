@@ -2,43 +2,49 @@
 <p class="mx-2">{{description}}</p>
 
 <select class="form-select form-select-sm" aria-label="Small select example" style="width: 500px;" id="emailRecipient">
-	<option selected>Select a recipient email</option>
-	<option value="Sheldon Wright <wright4306@live.missouristate.edu>">Sheldon Wright &lt;wright4306@live.missouristate.edu&gt;</option>
+  <option selected>Select a recipient email</option>
+  <option value="Sheldon Wright <wright4306@live.missouristate.edu>">Sheldon Wright
+    &lt;wright4306@live.missouristate.edu&gt;</option>
+
 </select>
 <div class="input-group input-group-sm mb-3" style="width: 500px; margin-top: 10px;">
-	<input type="text" class="form-control" aria-label="subject" placeholder="Subject" aria-describedby="inputGroup-sizing-sm" id="emailSubject" />
+  <input type="text" class="form-control" aria-label="subject" placeholder="Subject"
+    aria-describedby="inputGroup-sizing-sm" id="emailSubject" />
 </div>
 <textarea id="emailContent" rows="10" cols="50" style="width: 500px;"></textarea><br />
 <br />
 <button type="button" class="btn btn-dark" id="testBtn">Test</button>
 <script>
-	const testBtn = document.getElementById("testBtn"); 
+  const testBtn = document.getElementById("testBtn");
   const emailRecipient =
-	document.getElementById("emailRecipient"); 
-  const emailSubject = document.getElementById("emailSubject"); 
-  const emailContent = document.getElementById("emailContent"); 
-  testBtn.addEventListener("click", (event) => { 
-    event.preventDefault(); 
+    document.getElementById("emailRecipient");
+  const emailSubject = document.getElementById("emailSubject");
+  const emailContent = document.getElementById("emailContent");
+  testBtn.addEventListener("click", (event) => {
+    event.preventDefault();
     const recipient = emailRecipient.value;
-	  const subject = emailSubject.value; 
+    const subject = emailSubject.value;
     const content = emailContent.value;
-	fetch('/send-email', { 
-    method: 'POST', 
-    headers: { 'Content-Type': 'application/json', 
-  }, body: JSON.stringify({ 
-     to: recipient, 
-     subject: subject,
-     text: content, 
-     html: `<div>${content}</div>`, 
-    }), }) .then(response => { 
-      if (!response.ok) { 
-        throw new Error('Error sending email'); 
-      } 
-      return response.json(); 
-    }) .then(data => { 
-      console.log('Email sent:', data); 
+    fetch('/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }, body: JSON.stringify({
+        to: recipient,
+        subject: subject,
+        text: content,
+        html: `<div>${content}</div>`,
+      }),
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Error sending email');
+      }
+      return response.json();
+    }).then(data => {
+      console.log('Email sent:', data);
     })
-	.catch(error => {
-    console.error('Error:', error); 
-  }); });
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
 </script>
