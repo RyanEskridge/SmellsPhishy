@@ -81,18 +81,37 @@
 		});
 		toastList.forEach(toast => toast.show());
 	}
-	document.getElementById("linktoastbtn").onclick = function () {
-		var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-		var toastList = toastElList.map(function (toastEl) {
-			return new bootstrap.Toast(toastEl);
+	{
+
+		document.addEventListener('DOMContentLoaded', function () {
+			// Global toast
+			var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+			var toastList = toastElList.map(function (toastEl) {
+				return new bootstrap.Toast(toastEl);
+			});
+
+			const visibilityIndicator = document.getElementById("mg-api-key");
+			const keyHolder = document.getElementById("keyHolder");
+			keyHolder.value = '6a53edf24a8d7698710adc470115b90'; // fake key
+			let hidden = true;
+
+			visibilityIndicator.addEventListener('click', function () {
+				hidden = !hidden;
+				visibilityIndicator.innerHTML = hidden ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+				keyHolder.type = hidden ? 'password' : 'text';
+			});
+
+			document.getElementById("toastbtn").onclick = function () {
+				toastList.forEach(toast => toast.show());
+			};
+
+			document.getElementById("linktoastbtn").onclick = function () {
+				const link = linkHolder.value;
+				if (link) {
+					localStorage.setItem('savedLink', link);
+					toastList.forEach(toast => toast.show());
+				}
+			};
 		});
-		toastList.forEach(toast => toast.show());
-	}
-	document.getElementById("linktoastbtn").onclick = function () {
-		const link = linkHolder.value;
-		if (link) {
-			localStorage.setItem('savedLink', link);  // Save link in localStorage
-			showToast();
-		}
 	}
 </script>
