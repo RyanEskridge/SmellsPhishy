@@ -1,0 +1,54 @@
+{{> header }}
+
+<div class="container">
+  <h2>Filterable Table</h2>
+  <p>Type something in the input field to search the table for first names, last names or emails:</p>  
+  <input class="form-control" id="searchInput" type="text" placeholder="Search..">
+  <br>
+<!-- Users table -->
+<div class="table-responsive my-1">
+	<table class="table table-striped" id="userTable">
+		<thead>
+			<tr>
+				<th scope="col">ID</th>
+				<th scope="col">First</th>
+				<th scope="col">Last</th>
+				<th scope="col">Email</th>
+				<th scope="col">Title</th>
+				<th scope="col">Supervisor</th>
+				<th scope="col">Department</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each users}}
+			<tr data-user-id="{{id}}">
+				<th scope="row">{{id}}</th>
+				<td class="name-cell">{{FirstName}}</td>
+				<td class="name-cell">{{LastName}}</td>
+				<td class="email-addr">{{EmailAddress}}</td>
+				<td>{{JobTitle}}</td>
+				<td class="name-cell">{{Supervisor}}</td>
+				<td>{{Department}}</td>
+				<td>
+					<button type="button" class="btn brand-btn" data-function="add" title="add user" data-bs-toggle="modal" data-bs-target="#addUser"><i class="bi bi-plus-lg"></i></button>
+				</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</div>
+  
+  <p>Note that we start the search in tbody, to prevent filtering the table headers.</p>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#userTable tbody tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>

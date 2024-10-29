@@ -4,9 +4,12 @@ const path = require('path');
 
 const { clerkMiddleware } = require('@clerk/express');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
+const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
 const EmailTemplate = require('./models/EmailTemplate');
+const Targets = require('./models/Targets');
+const Lists = require('./models/Lists');
 
 const app = express();
 
@@ -14,6 +17,7 @@ require('dotenv').config();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 
 // Public routes
 app.use(express.static('public'));
@@ -40,44 +44,52 @@ app.get('/signup', (req, res) => {
 app.use(clerkMiddleware());
 app.use(ensureAuthenticated);
 
-app.engine('hbs', exphbs.engine({ extname: '.hbs' }));
+app.engine('hbs', exphbs.engine({ 
+  extname: '.hbs',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials'),
+}));
 app.set('view engine', 'hbs');
+app.set('view cache', false);
 
-app.engine(
-  'hbs',
-  exphbs.engine({
-    extname: '.hbs',
-    helpers: {
-      increment: function (value) {
-        return parseInt(value) + 1;
-      }
-    }
-  })
-);
+app.use(breadcrumbs);
 
 /* Routers for crucial parts of the app
 that have children or require additional logic. */
 
 const campaignsRouter = require('./routes/campaigns');
 const templatesRouter = require('./routes/templates');
-const usersRouter = require('./routes/users');
+const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
-
 const mailRouter = require('./routes/mail');
-const uploadRouter = require('./routes/upload');
 
 app.use('/campaigns', campaignsRouter);
 app.use('/templates', templatesRouter);
-app.use('/users', usersRouter);
+app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
 
-// Simple routes
-app.get('/', (req, res) => {
-  res.render('dashboard', {
-    title: 'Dashboard',
-    description: 'Welcome to the dashboard'
-  });
+app.get('/', async (req, res) => {
+  try {
+    const [templateCount, targetCount, listCount] = await Promise.all([
+      EmailTemplate.count(),
+      Targets.count(),
+      Lists.count()
+    ]);
+
+    res.render('dashboard', {
+      templateCount,
+      targetCount,
+      listCount,
+      title: 'Dashboard',
+      description: 'Welcome to the dashboard'
+    });
+  } catch (error) {
+    console.error('Error fetching counts:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
+
+
 
 app.get('/settings', (req, res) => {
   res.render('settings', {
@@ -90,7 +102,6 @@ app.use(express.json());
 
 // Services
 app.use(mailRouter);
-app.use(uploadRouter);
 
 // Synchronize all models with the database
 sequelize

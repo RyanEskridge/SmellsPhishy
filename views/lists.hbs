@@ -1,0 +1,50 @@
+{{> header}}
+
+<form action="/targets/lists" method="POST">
+  <div class="input-group mb-3">
+    <input class="form-control" type="text" name="ListName" placeholder="List name" required>
+    <input class="form-control mx-2" type="text" name="ListDescription" placeholder="List description" required> 
+  </div>
+  <button class="btn brand-btn" type="submit"><i class="bi bi-card-list"></i> Create</button>
+</form>
+
+<div class="table-responsive my-4">
+<table class="table table-striped">
+  <thead class="border-top border-bottom border-secondary">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each lists}}
+      <tr>
+        <td>{{ListName}}</td>
+        <td>{{ListDescription}}</td>
+        <td>
+          <a href="/targets/lists/{{id}}" class="btn btn-secondary"><i class="bi bi-pencil"></i></a>
+          <button data-list-id="{{id}}" class="delete-list btn brand-btn"><i class="bi bi-trash3"></i></button>
+        </td>
+      </tr>
+    {{else}}
+      <tr>
+        <td colspan="3">No lists available.</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+</div>
+
+<script>
+  document.querySelectorAll('.delete-list').forEach(button => {
+    button.addEventListener('click', function() {
+      const listId = this.getAttribute('data-list-id');
+      if (confirm('Are you sure you want to delete this list?')) {
+        fetch(`/targets/lists/${listId}`, { method: 'DELETE' })
+          .then(response => location.reload())
+          .catch(error => alert('Failed to delete list.'));
+      }
+    });
+  });
+</script>

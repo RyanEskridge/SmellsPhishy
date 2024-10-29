@@ -1,2 +1,24 @@
-<h1 class='mx-2'>{{title}}</h1>
-<p class='mx-2'>{{description}}</p>
+{{> header}}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="card col mx-2 bg-light" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title h1">{{templateCount}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Templates</h6>
+        </div>
+        </div>
+        <div class="card col mx-2 bg-light" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title h1">{{targetCount}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Targets</h6>
+        </div>
+        </div>
+        <div class="card col mx-2 bg-light" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title h1">{{listCount}}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Lists</h6>
+        </div>
+        </div>
+    </div>
+</div>

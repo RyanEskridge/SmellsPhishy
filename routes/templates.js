@@ -151,10 +151,9 @@ router.post('/delete/:id', async (req, res) => {
   }
 });
 
-// Test route
-router.get('/test', (req, res) => {
+router.get('/testing-tool', (req, res) => {
   res.render('templates_test', {
-    title: 'Test Template',
+    title: 'Testing Tool',
     description: 'Test a template here.'
   });
 });

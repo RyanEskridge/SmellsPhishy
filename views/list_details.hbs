@@ -1,0 +1,77 @@
+{{> header }}
+
+<input class="form-control" id="searchInput" type="text" placeholder="Search..">
+<br>
+
+<div class="table-responsive my-4">
+<form id="updateTargetsForm">
+<table class="table table-striped">
+    <thead class="border-top border-bottom border-secondary">
+      <tr>
+        <th scope="col">Include</th>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Email</th>
+        <th scope="col">Title</th>
+        <th scope="col">Supervisor</th>
+        <th scope="col">Department</th>
+      </tr>
+    </thead>
+    <tbody id="targetsTable">
+      {{#each targets}}
+        <tr>
+            <td style="background: rgba(0,0,0,.1); text-align: center;">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="selectedTargets"
+              value="{{id}}"
+              {{#if isSelected}}checked{{/if}}
+            >
+            </td>
+            <td class="name-cell">{{FirstName}}</td>
+            <td class="name-cell">{{LastName}}</td>
+            <td class="email-addr">{{EmailAddress}}</td>
+            <td>{{JobTitle}}</td>
+            <td class="name-cell">{{Supervisor}}</td>
+            <td>{{Department}}</td>
+        </tr>
+      {{else}}
+        <tr>
+          <td colspan="5">No targets available.</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-dark" type="submit" style="width: 250px;">Save</button>
+  </div>
+</form>
+</div>
+
+<script>
+  $(document).ready(function(){
+    $("#searchInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#targetsTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+  });
+  document.getElementById('updateTargetsForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const listId = {{list.id}};
+    const selectedTargets = Array.from(document.querySelectorAll('input[name="selectedTargets"]:checked'))
+      .map(input => input.value);
+
+    fetch(`/targets/lists/${listId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ selectedTargets })
+    })
+    .then(response => response.ok ? alert('List updated successfully.') : alert('Failed to update list.'))
+    .catch(error => console.error('Error updating list:', error));
+  });
+</script>

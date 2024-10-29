@@ -135,3 +135,26 @@ font-style: normal;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.form-check-input:checked {
+  background-color: #FF5722;
+  border-color: #FF5722;
+}
+
+li.breadcrumb-item a:before {
+  color: #FF5722;
+}
+
+li.breadcrumb-item {
+  color: black;
+}
+
+li.breadcrumb-item a {
+  text-decoration: none;
+  color: gray;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: grey;
+  content: var(--bs-breadcrumb-divider, "\203A");
+}
