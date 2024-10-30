@@ -15,45 +15,57 @@
 	}
 </style>
 
-<div class="container my-5">
+<div class="container-fluid my-5 mx-0 p-0">
 	<div class="row">
 		<div class="col-6">
+
 			<!-- Mailgun API Key Section -->
-			<h4>Mailgun API Key</h4>
-			<div class="input-group mt-3 mb-3">
-				<input type="password" id="keyHolder" class="form-control" placeholder="Mailgun API Key"
-					aria-label="Mailgun API Key" aria-describedby="mg-api-key" />
-				<span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>
+			<div class="border rounded-2 p-5 mb-3">
+				<h5>Mailgun API Key</h5>
+				<div class="input-group mt-3 mb-3">
+					<input type="password" id="keyHolder" class="form-control" placeholder="Mailgun API Key"
+						aria-label="Mailgun API Key" aria-describedby="mg-api-key" />
+					<span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>
+				</div>
+				<div class="d-flex justify-content-start">
+					<button id="saveMailgunKeyBtn" type="button" class="btn btn-dark">Save</button>
+				</div>
 			</div>
-			<div class="d-flex justify-content-start mb-3">
-				<button id="saveMailgunKeyBtn" type="button" class="btn btn-dark">Save</button>
-			</div>
+		</div>		
 
-			<!-- Link Settings Section -->
-			<h4>Link Settings</h4>
-			<div class="input-group mt-3 mb-3">
-				<input type="url" id="linkHolder" class="form-control" placeholder="Enter custom link"
-					aria-label="Custom Link" aria-describedby="link-settings" />
-			</div>
-			<div class="d-flex justify-content-start">
-				<button id="saveCustomLinkBtn" type="button" class="btn btn-dark">Save</button>
-			</div>
-
-			<!-- Bitly Link Settings Section -->
-			<h4>Bitly Link Settings</h4>
-			<div class="input-group mt-3 mb-3">
-				<input type="url" id="bitlyLinkUrl" class="form-control" placeholder="Enter URL" aria-label="URL"
-					aria-describedby="bitly-link-url" />
-			</div>
-			<div class="d-flex justify-content-start">
-				<button id="createBitlyLinkBtn" type="button" class="btn btn-dark">Create Bitly Link</button>
-			</div>
-			<div class="input-group mt-3 mb-3">
-				<input type="text" id="generatedBitlyLink" class="form-control" placeholder="Generated Bitly Link"
-					aria-label="Generated Bitly Link" readonly />
-				<button class="btn btn-dark" type="button" id="copyBitlyLinkBtn">Copy</button>
+		<!-- Link Settings Section -->
+		<div class="col-6">
+			<div class="border rounded-2 p-5 mb-3">
+				<h5>Link Settings</h5>
+				<div class="input-group mt-3 mb-3">
+					<input type="url" id="linkHolder" class="form-control" placeholder="Enter custom link"
+						aria-label="Custom Link" aria-describedby="link-settings" />
+				</div>
+				<div class="d-flex justify-content-start">
+					<button id="saveCustomLinkBtn" type="button" class="btn btn-dark">Save</button>
+				</div>
 			</div>
 		</div>
+		
+		<!-- Bitly Link Settings Section -->
+		<div class="col-6 mt-2">
+			<div class="border rounded-2 p-5">
+				<h5>Bitly Link Settings</h5>
+				<div class="input-group mt-3 mb-3">
+					<input type="url" id="bitlyLinkUrl" class="form-control" placeholder="Enter URL" aria-label="URL"
+						aria-describedby="bitly-link-url" />
+				</div>
+				<div class="d-flex justify-content-start">
+					<button id="createBitlyLinkBtn" type="button" class="btn btn-dark">Create Bitly Link</button>
+				</div>
+				<div class="input-group mt-3">
+					<input type="text" id="generatedBitlyLink" class="form-control" placeholder="Generated Bitly Link"
+						aria-label="Generated Bitly Link" readonly />
+					<button class="btn btn-dark" type="button" id="copyBitlyLinkBtn">Copy</button>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </div>
 
