@@ -19,7 +19,7 @@ CREATE TABLE "email_templates" (
 CREATE TABLE "campaign" (
   "id" integer UNIQUE PRIMARY KEY,
   "title" varchar DEFAULT 'Campaign Title',
-  "notes" text DEFAULT null,
+  "notes" text DEFAULT '',
   "user_id" integer,
   "status" bool DEFAULT false,
   "created_at" timestamp NOT NULL

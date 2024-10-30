@@ -24,7 +24,7 @@ const EmailTemplate = sequelize.define(
   },
   {
     tableName: 'email_templates',
-    timestamps: false
+    timestamps: true
   }
 );
 

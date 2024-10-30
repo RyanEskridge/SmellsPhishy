@@ -24,10 +24,10 @@
     <tbody>
         {{#each templates}}
         <tr>
-        <th scope="row">{{this.id}}</th>
-        <td>{{this.name}}</td>
-        <td>{{this.subject}}</td>
-        <td class="truncate">{{this.body}}</td>
+        <th scope="row" class="text-center" style="vertical-align: middle;">{{this.id}}</th>
+        <td class="text-center" style="vertical-align: middle;">{{this.name}}</td>
+        <td class="text-center" style="vertical-align: middle;">{{this.subject}}</td>
+        <td class="text-center truncate" style="vertical-align: middle;">{{this.body}}</td>
         <td>
             <a href="/templates/edit/{{this.id}}" class="btn btn-secondary mx-2">
                     <i class="bi bi-pen p-2"></i>

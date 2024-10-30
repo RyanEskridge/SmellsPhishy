@@ -1,6 +1,8 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
+const session = require('express-session');
+const flash = require('connect-flash');
 
 const { clerkMiddleware } = require('@clerk/express');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
@@ -50,6 +52,9 @@ app.engine(
     helpers: {
       increment: function (value) {
         return parseInt(value) + 1;
+      },
+      eq: function (arg1, arg2) {
+        return arg1 == arg2;
       }
     }
   })
@@ -94,7 +99,7 @@ app.use(uploadRouter);
 
 // Synchronize all models with the database
 sequelize
-  .sync({ force: false }) // IMPORTAINT!!! Set to false in production!!!
+  .sync({ force: false }) // Set to false if you want persistent DB. Set to true in production (or remove line? not sure yet)
   .then(() => {
     console.log('Database synced successfully');
   })

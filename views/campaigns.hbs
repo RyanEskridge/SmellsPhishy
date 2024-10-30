@@ -1,2 +1,58 @@
+<style>
+    .table {width: 50%;}
+    .col-name { width: 30%; }
+    .col-description { width: 30%; }
+    .col-status { width: 1%; }
+    .alert-success { color: green; }
+    .alert-error { color: red; }
+</style>
+
 <h1 class='mx-2'>{{title}}</h1>
 <p class='mx-2'>{{description}}</p>
+
+<div class="camp-table my-4"><h3>Campaigns List</h3></div>
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th scope="col" class="col-name text-center">Name</th>
+            <th scope="col" class="col-description text-center">Description</th>
+            <th scope="col" class="col-status text-center">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each campaigns}}
+        <tr>
+            <th scope="row" class="text-center" style="vertical-align: middle;">{{this.name}}</th>
+            <td class="text-center" style="vertical-align: middle;">{{this.notes}}</td>
+            <td class="text-center" style="vertical-align: middle;">
+                {{#if this.status}}
+                    <span style="color: green;">&#9679;</span>
+                {{else}}
+                    <span style="color: red;">&#9679;</span>
+                {{/if}}
+            </td>
+            <td>
+                <button class="btn brand-btn" onclick="confirmDeletion('{{this.id}}')">
+                <i class="bi bi-trash3"></i> Delete
+            </button>
+            <form id="delete-form-{{this.id}}" action="/campaigns/delete/{{this.id}}" method="POST" style="display:none;"></form>
+            </td>
+            <td>
+                <a href="/campaigns/manage/{{this.id}}" class="btn btn-secondary mx-2">
+                    <i>Manage Campaign</i>
+            </a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+    function confirmDeletion(id) {
+        // Display confirmation dialog
+        if (confirm('Are you sure you want to delete this campaign?')) {
+            // If confirmed, submit the corresponding form
+            document.getElementById('delete-form-' + id).submit();
+        }
+    }
+    </script>
