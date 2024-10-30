@@ -179,7 +179,6 @@ router.put('/lists/:id', async (req, res) => {
 
     list.ListTargets = selectedTargets || [];
     await list.save();
-
     res.status(200).json({ message: 'List updated successfully.' });
   } catch (error) {
     console.error('Error updating list:', error);
