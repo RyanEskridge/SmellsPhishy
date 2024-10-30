@@ -1,9 +1,7 @@
-<h1 class="">{{title}}</h1>
-<p class="">{{description}}</p>
-
+{{> header }}
 <!-- Button trigger modal -->
 <button type="button" class="btn brand-btn" data-bs-toggle="modal" data-bs-target="#addModal" style="width: 250px;">
-<i class="bi bi-person-plus"></i> Add user(s)
+<i class="bi bi-person-plus"></i> Add target(s)
 </button>
 
 <!-- Add Modal -->
@@ -11,7 +9,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header bord-0 bg-light">
-        <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="bi bi-person-plus"></i> Add user(s)</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="bi bi-person-plus"></i> Add target(s)</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -35,37 +33,37 @@
 							files
 						</label>
 						<!-- Form for file upload -->
-						<form action="/upload" method="POST" enctype="multipart/form-data">
-							<input class="form-control" type="file" id="formFile" name="file" accept=".csv" required>
+						<form action="/targets/upload" method="POST" enctype="multipart/form-data">
+							<input class="form-control" type="file" id="formFile" name="csvFile" accept=".csv" required>
 							<br />
 							<button class="btn btn-dark" type="submit">Upload</button>
 						</form>
 					</div>
 				</div>
 				<div class="tab-pane fade" id="manual-add" role="tabpanel" aria-labelledby="manual-tab">
-					<form class="p-4" action="/users/add" method="POST">
+					<form class="p-4" action="/targets/add" method="POST">
 						<div class="input-group mb-3">
 							<span class="input-group-text">First name</span>
-							<input type="text" class="form-control mr-2" id="firstName" name="firstName" required>
+							<input type="text" class="form-control mr-2" id="FirstName" name="FirstName" required>
 
 							<span class="input-group-text">Last name</span>
-							<input type="text" class="form-control" id="lastName" name="lastName" required>
+							<input type="text" class="form-control" id="LastName" name="LastName" required>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text">Email</span>
-							<input type="text" class="form-control" id="email" name="email" required>
+							<input type="text" class="form-control" id="EmailAddress" name="EmailAddress" required>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text">Job title</span>
-							<input type="text" class="form-control" id="jobTitle" name="jobTitle" required>
+							<input type="text" class="form-control" id="JobTitle" name="JobTitle" required>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text">Supervisor</span>
-							<input type="text" class="form-control" id="supervisor" name="supervisor" required>
+							<input type="text" class="form-control" id="Supervisor" name="Supervisor" required>
 						</div>
 						<div class="input-group mb-3">
 							<span class="input-group-text">Department</span>
-							<input type="text" class="form-control" id="department" name="department" required>
+							<input type="text" class="form-control" id="Department" name="Department" required>
 						</div>
 						<div class="d-flex justify-content-end">
 							<button type="submit" class="btn btn-dark" style="width: 180px;">Add</button>
@@ -79,12 +77,12 @@
   </div>
 </div>
 
-<!-- Users table -->
+<!-- Targets table -->
 <div class="table-responsive my-4">
 	<table class="table table-striped mt-5">
-		<thead>
+		<thead class="border-top border-bottom border-secondary">
 			<tr>
-				<th scope="col">#</th>
+				<th scope="col">ID</th>
 				<th scope="col">First</th>
 				<th scope="col">Last</th>
 				<th scope="col">Email</th>
@@ -95,18 +93,18 @@
 			</tr>
 		</thead>
 		<tbody>
-			{{#each users}}
-			<tr data-user-id="{{id}}">
-				<th scope="row">{{increment @index}}</th>
-				<td class="name-cell">{{firstName}}</td>
-				<td class="name-cell">{{lastName}}</td>
-				<td class="email-addr">{{email}}</td>
-				<td>{{jobTitle}}</td>
-				<td class="name-cell">{{supervisor}}</td>
-				<td>{{department}}</td>
+			{{#each targets}}
+			<tr data-target-id="{{id}}">
+				<th scope="row">{{id}}</th>
+				<td class="name-cell">{{FirstName}}</td>
+				<td class="name-cell">{{LastName}}</td>
+				<td class="email-addr">{{EmailAddress}}</td>
+				<td>{{JobTitle}}</td>
+				<td class="name-cell">{{Supervisor}}</td>
+				<td>{{Department}}</td>
 				<td>
-					<button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit user" data-bs-toggle="modal" data-bs-target="#editUserModal" ><i class="bi bi-person-gear"></i></button>
-					<button type="button" class="btn brand-btn" data-function="delete" title="delete user" data-bs-toggle="modal" data-bs-target="#deleteUserModal"><i class="bi bi-trash3"></i></button>
+					<button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit target" data-bs-toggle="modal" data-bs-target="#editTargetModal" ><i class="bi bi-person-gear"></i></button>
+					<button type="button" class="btn brand-btn" data-function="delete" title="delete target" data-bs-toggle="modal" data-bs-target="#deleteTargetModal"><i class="bi bi-trash3"></i></button>
 				</td>
 			</tr>
 			{{/each}}
@@ -115,39 +113,39 @@
 </div>
 
 <!-- Edit modal -->
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<div class="modal fade" id="editTargetModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header bg-light">
-        <h5 class="modal-title" id="editModalLabel"><i class="bi bi-person-gear"></i> Edit User</h5>
+        <h5 class="modal-title" id="editModalLabel"><i class="bi bi-person-gear"></i> Edit Target</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="editUserForm">
-          <input type="hidden" id="editUserId" name="id">
+        <form id="editTargetForm">
+          <input type="hidden" id="editTargetId" name="id">
           <div class="mb-3">
           <div class="input-group mb-3">
 			<span class="input-group-text">First</span>
-			<input type="text" class="form-control" id="editFirstName" name="firstName" required>
+			<input type="text" class="form-control" id="editFirstName" name="FirstName" required>
 
             <span class="input-group-text">Last</span>
-            <input type="text" class="form-control" id="editLastName" name="lastName" required>
+            <input type="text" class="form-control" id="editLastName" name="LastName" required>
           </div>
           <div class="input-group mb-3">
             <span class="input-group-text">Email</span>
-            <input type="email" class="form-control" id="editEmail" name="email" required>
+            <input type="email" class="form-control" id="editEmail" name="Email" required>
           </div>
           <div class="input-group mb-3">
             <span class="input-group-text">Job title</span>
-            <input type="text" class="form-control" id="editJobTitle" name="jobTitle" required>
+            <input type="text" class="form-control" id="editJobTitle" name="JobTitle" required>
           </div>
           <div class="input-group mb-3">
             <span class="input-group-text">Supervisor</span>
-            <input type="text" class="form-control" id="editSupervisor" name="supervisor" required>
+            <input type="text" class="form-control" id="editSupervisor" name="Supervisor" required>
           </div>
           <div class="input-group mb-3">
             <span class="input-group-text">Department</span>
-            <input type="text" class="form-control" id="editDepartment" name="department" required>
+            <input type="text" class="form-control" id="editDepartment" name="Department" required>
           </div>
 			<div class="d-flex justify-content-end" style="float: right;">
 				<button type="submit" class="btn btn-dark" style="width: 180px;">Save</button>
@@ -160,7 +158,7 @@
 </div>
 
 <!-- Delete modal -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteTargetModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header border-0">
@@ -168,7 +166,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body border-0">
-        Are you sure you want to delete this user?
+        Are you sure you want to delete this target?
       </div>
       <div class="modal-footer border-0">
         <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Cancel</button>
@@ -183,4 +181,4 @@
 	  document.getElementById('formFile').value = ''; 
   };
 </script>
- <script src="/js/user-modals.js"></script> 
+ <script src="/js/target-modals.js"></script> 
