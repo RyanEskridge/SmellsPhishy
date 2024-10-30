@@ -24,10 +24,9 @@
 				<input type="password" id="keyHolder" class="form-control" placeholder="Mailgun API Key"
 					aria-label="Mailgun API Key" aria-describedby="mg-api-key" />
 				<span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>
-
 			</div>
 			<div class="d-flex justify-content-start mb-3">
-				<button id="toastbtn" type="button" class="btn btn-dark">Save</button>
+				<button id="saveMailgunKeyBtn" type="button" class="btn btn-dark">Save</button>
 			</div>
 
 			<!-- Link Settings Section -->
@@ -36,25 +35,66 @@
 				<input type="url" id="linkHolder" class="form-control" placeholder="Enter custom link"
 					aria-label="Custom Link" aria-describedby="link-settings" />
 			</div>
-
 			<div class="d-flex justify-content-start">
-				<button id="linktoastbtn" type="button" class="btn btn-dark">Save</button>
+				<button id="saveCustomLinkBtn" type="button" class="btn btn-dark">Save</button>
+			</div>
+
+			<!-- Bitly Link Settings Section -->
+			<h4>Bitly Link Settings</h4>
+			<div class="input-group mt-3 mb-3">
+				<input type="url" id="bitlyLinkUrl" class="form-control" placeholder="Enter URL" aria-label="URL"
+					aria-describedby="bitly-link-url" />
+			</div>
+			<div class="d-flex justify-content-start">
+				<button id="createBitlyLinkBtn" type="button" class="btn btn-dark">Create Bitly Link</button>
+			</div>
+			<div class="input-group mt-3 mb-3">
+				<input type="text" id="generatedBitlyLink" class="form-control" placeholder="Generated Bitly Link"
+					aria-label="Generated Bitly Link" readonly />
+				<button class="btn btn-dark" type="button" id="copyBitlyLinkBtn">Copy</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+<!-- Toast for Mailgun API Key -->
+<div class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true"
+	id="mailgunToast">
 	<div class="d-flex">
 		<div class="toast-body">
 			<i class="bi bi-check-square"></i>
-			Your changes have been saved.
+			Your Mailgun API key has been saved.
 		</div>
 		<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
 			aria-label="Close"></button>
 	</div>
 </div>
 
+<!-- Toast for Custom Link -->
+<div class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true"
+	id="linkToast">
+	<div class="d-flex">
+		<div class="toast-body">
+			<i class="bi bi-check-square"></i>
+			Your custom link has been saved.
+		</div>
+		<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+			aria-label="Close"></button>
+	</div>
+</div>
+
+<!-- Toast for Bitly Link -->
+<div class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true"
+	id="bitlyToast">
+	<div class="d-flex">
+		<div class="toast-body">
+			<i class="bi bi-check-square"></i>
+			Your Bitly link has been created.
+		</div>
+		<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+			aria-label="Close"></button>
+	</div>
+</div>
 
 <script>
 	const fakeKey = '6a53edf24a8d7698710adc470115b90';
@@ -73,44 +113,57 @@
 				eyeClosed; keyHolder.type = 'text';
 		}
 	});
-	document.getElementById("toastbtn").onclick = function () {
-		var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-		var toastList = toastElList.map(function (toastEl) {
-			return new bootstrap.Toast(toastEl);
-		});
-		toastList.forEach(toast => toast.show());
-	}
-	{
 
-		document.addEventListener('DOMContentLoaded', function () {
-			// Global toast
-			var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-			var toastList = toastElList.map(function (toastEl) {
-				return new bootstrap.Toast(toastEl);
+	document.getElementById("saveMailgunKeyBtn").onclick = function () {
+		var toast = new bootstrap.Toast(document.getElementById('mailgunToast'));
+		toast.show();
+	}
+
+	document.getElementById("saveCustomLinkBtn").onclick = function () {
+		const link = linkHolder.value;
+		if (link) {
+			localStorage.setItem('savedLink', link);
+			var toast = new bootstrap.Toast(document.getElementById('linkToast'));
+			toast.show();
+		}
+	}
+
+	document.getElementById('createBitlyLinkBtn').addEventListener('click', async () => {
+		const url = document.getElementById('bitlyLinkUrl').value;
+
+		// Basic URL validation
+		if (!url || !url.match(/^https?:\/\/[^\s$.?#].[^\s]*$/)) {
+			alert('Please enter a valid URL.');
+			return;
+		}
+
+		try {
+			const response = await fetch('/api/create-bitly-link', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ url })
 			});
 
-			const visibilityIndicator = document.getElementById("mg-api-key");
-			const keyHolder = document.getElementById("keyHolder");
-			keyHolder.value = '6a53edf24a8d7698710adc470115b90'; // fake key
-			let hidden = true;
+			if (response.ok) {
+				const data = await response.json();
+				document.getElementById('generatedBitlyLink').value = data.link;
+				var toast = new bootstrap.Toast(document.getElementById('bitlyToast'));
+				toast.show();
+			} else {
+				console.error('Error creating Bitly link:', response.statusText);
+			}
+		} catch (error) {
+			console.error('Error creating Bitly link:', error);
+		}
+	});
 
-			visibilityIndicator.addEventListener('click', function () {
-				hidden = !hidden;
-				visibilityIndicator.innerHTML = hidden ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
-				keyHolder.type = hidden ? 'password' : 'text';
-			});
-
-			document.getElementById("toastbtn").onclick = function () {
-				toastList.forEach(toast => toast.show());
-			};
-
-			document.getElementById("linktoastbtn").onclick = function () {
-				const link = linkHolder.value;
-				if (link) {
-					localStorage.setItem('savedLink', link);
-					toastList.forEach(toast => toast.show());
-				}
-			};
-		});
-	}
+	document.getElementById('copyBitlyLinkBtn').addEventListener('click', () => {
+		const linkInput = document.getElementById('generatedBitlyLink');
+		linkInput.select();
+		linkInput.setSelectionRange(0, 99999); // For mobile devices
+		document.execCommand('copy');
+		alert('Copied the link: ' + linkInput.value);
+	});
 </script>

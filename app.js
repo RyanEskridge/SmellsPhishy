@@ -10,6 +10,7 @@ const sequelize = require('./config/database');
 const EmailTemplate = require('./models/EmailTemplate');
 const Targets = require('./models/Targets');
 const Lists = require('./models/Lists');
+const { createLink } = require('./helpers/linkHelper');
 
 const app = express();
 
@@ -47,10 +48,10 @@ app.use(ensureAuthenticated);
 app.engine('hbs', exphbs.engine({ 
   extname: '.hbs',
   layoutsDir: path.join(__dirname, 'views/layouts'),
-  partialsDir: path.join(__dirname, 'views/partials'),
+  partialsDir: path.join(__dirname, 'views/partials')
 }));
 app.set('view engine', 'hbs');
-app.set('view cache', false);
+app.set('views', path.join(__dirname, 'views'));
 
 app.use(breadcrumbs);
 
@@ -89,7 +90,22 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.post('/api/create-bitly-link', async (req, res) => {
+  const { url } = req.body;
 
+  // Basic URL validation
+  if (!url || !url.match(/^https?:\/\/[^\s$.?#].[^\s]*$/)) {
+    return res.status(400).json({ error: 'Invalid URL' });
+  }
+
+  try {
+    const link = await createLink(url);
+    res.status(200).json({ link });
+  } catch (error) {
+    console.error('Error creating Bitly link:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Failed to create Bitly link' });
+  }
+});
 
 app.get('/settings', (req, res) => {
   res.render('settings', {
@@ -105,7 +121,7 @@ app.use(mailRouter);
 
 // Synchronize all models with the database
 sequelize
-  .sync({ force: false }) // IMPORTAINT!!! Set to false in production!!!
+  .sync({ force: false }) // IMPORTANT!!! Set to false in production!!!
   .then(() => {
     console.log('Database synced successfully');
   })
