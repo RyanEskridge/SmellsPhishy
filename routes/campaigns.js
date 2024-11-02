@@ -2,6 +2,7 @@ const express = require('express');
 const clerk = require
 const router = express.Router();
 const Campaigns = require('../models/Campaigns');
+const { clerkClient } = require('@clerk/clerk-sdk-node');
 
 router.get('/', async (req, res) => {
   try {
@@ -33,7 +34,6 @@ router.post('/create', async (req, res) => {
   const name = req.body.name;
   const notes = req.body.notes;
   const { userId } = req.auth; 
-  console.log(req.body);
   try {
     await Campaigns.create({name, notes, owner: userId});
     res.redirect('/campaigns');
@@ -64,9 +64,9 @@ router.post('/delete/:id', async (req, res) => {
 
 router.get('/manage/:id', async (req, res) => {
   const campaignId = req.params.id;
-
   try {
     const campaign = await Campaigns.findByPk(campaignId);
+    user = await clerkClient.users.getUser(campaign.owner)
 
     if (!campaign) {
       return res.status(404).send('Campaign not found.');
@@ -74,7 +74,9 @@ router.get('/manage/:id', async (req, res) => {
 
     res.render('campaign_manage', {
       title: 'Campain Manager',
-      description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.'
+      description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.',
+      campaign: campaign.get({plain: true}),
+      user
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);

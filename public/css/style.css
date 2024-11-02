@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-html, body, main, .sidebar, {
+html, body, main, .sidebar {
     height: 100vh;
 }
 
@@ -158,3 +158,9 @@ li.breadcrumb-item a {
   color: grey;
   content: var(--bs-breadcrumb-divider, "\203A");
 }
+
+.small-italic {
+    margin: auto;
+    font-size: smaller;
+    font-style: italic;
+  }

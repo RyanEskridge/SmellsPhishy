@@ -1,8 +1,6 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
-const session = require('express-session');
-const flash = require('connect-flash');
 
 const { clerkMiddleware } = require('@clerk/express');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
