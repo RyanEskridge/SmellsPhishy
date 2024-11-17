@@ -1,9 +1,11 @@
 const { DataTypes } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
+const EmailTemplate = require('./EmailTemplate');
+const Campaigns = require('./Campaigns')
 const sequelize = require('../config/database');
 
-const Campaigns = sequelize.define(
-    'Campaigns',
+const Tests = sequelize.define(
+    'Tests',
     {
         id: {
             type: DataTypes.UUID,
@@ -11,12 +13,25 @@ const Campaigns = sequelize.define(
             primaryKey: true,
             allowNull: false
         },
-        name: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        notes: {
-            type: DataTypes.TEXT
+        camp_id: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: Campaigns,
+                key: 'id'
+            },
+            allowNull: false
+        },
+        template_id: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: EmailTemplate,
+                key: 'id'
+            },
+            allowNull: false
         },
         owner: {
             type: DataTypes.TEXT,
@@ -26,11 +41,7 @@ const Campaigns = sequelize.define(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
         }
-    },
-    {
-        tableName: 'campaigns',
-        timestamps: true      
     }
-);
+)
 
-module.exports = Campaigns
+module.exports = Tests;

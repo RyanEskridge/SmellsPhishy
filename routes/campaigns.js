@@ -34,6 +34,7 @@ router.post('/create', async (req, res) => {
   const name = req.body.name;
   const notes = req.body.notes;
   const { userId } = req.auth; 
+  // console.log(req.body);
   try {
     await Campaigns.create({name, notes, owner: userId});
     res.redirect('/campaigns');
