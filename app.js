@@ -9,9 +9,15 @@ const { ensureAuthenticated } = require('./utils/customMiddleware');
 const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
+
+const { EmailTemplate, Targets, Lists } = require('./models')
+
+/*
 const EmailTemplate = require('./models/EmailTemplate');
 const Targets = require('./models/Targets');
 const Lists = require('./models/Lists');
+*/
+
 const { createLink } = require('./helpers/linkHelper');
 
 const app = express();
@@ -138,7 +144,7 @@ app.use(mailRouter);
 
 // Synchronize all models with the database
 sequelize
-  .sync({ force: false }) // Set to false if you want persistent DB. Set to true in production (or remove line? not sure yet)
+  .sync({ force: false }) // Set to false if you want persistent DB. Remove in production.
   .then(() => {
     console.log('Database synced successfully');
   })
