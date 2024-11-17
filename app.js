@@ -1,15 +1,22 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const { clerkMiddleware } = require('@clerk/express');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
 const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
+const {EmailTemplate, Targets, Lists, Tests, Campaigns} = require('./models');
+
+/*
 const EmailTemplate = require('./models/EmailTemplate');
 const Targets = require('./models/Targets');
 const Lists = require('./models/Lists');
+const Tests = require('./models')
+*/
+
 const { createLink } = require('./helpers/linkHelper');
 
 const app = express();
@@ -135,14 +142,16 @@ app.use(express.json());
 app.use(mailRouter);
 
 // Synchronize all models with the database
-sequelize
-  .sync({ force: false }) // Set to false if you want persistent DB. Set to true in production (or remove line? not sure yet)
-  .then(() => {
-    console.log('Database synced successfully');
-  })
-  .catch((err) => {
-    console.error('Error syncing database:', err);
-  });
+(async () => {
+  try {
+      await sequelize.sync({ force: true }); // `force: true` recreates tables; remove for production
+      console.log('Database synced!');
+  } catch (error) {
+      console.error('Error:', error);
+  } finally {
+      await sequelize.close();
+  }
+})();
 
 // App start
 const PORT = process.env.PORT || 8080;

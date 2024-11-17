@@ -2,7 +2,6 @@ const express = require('express');
 const clerk = require
 const router = express.Router();
 const Campaigns = require('../models/Campaigns');
-const { clerkClient } = require('@clerk/clerk-sdk-node');
 
 router.get('/', async (req, res) => {
   try {

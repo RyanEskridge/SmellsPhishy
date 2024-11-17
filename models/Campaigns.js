@@ -31,4 +31,4 @@ const Campaigns = sequelize.define(
     }
 );
 
-module.exports = Campaigns
+module.exports = Campaigns;

@@ -7,4 +7,5 @@ const sequelize = new Sequelize({
   logging: false // Disable logging, set to true for debugging
 });
 
+
 module.exports = sequelize;
