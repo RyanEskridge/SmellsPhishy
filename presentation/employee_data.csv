@@ -1,0 +1,11 @@
+FirstName,LastName,EmailAddress,JobTitle,Department,Supervisor
+Alice,Smith,alice.smith@example.com,Software Engineer,John Doe,Engineering
+Bob,Johnson,bob.johnson@example.com,Product Manager,Jane Doe,Product
+Charlie,Brown,charlie.brown@example.com,QA Analyst,John Doe,Quality Assurance
+Diana,Prince,diana.prince@example.com,UX Designer,Mary Johnson,Design
+Eve,White,eve.white@example.com,DevOps Engineer,John Doe,IT Operations
+Frank,Black,frank.black@example.com,Data Scientist,Jane Doe,Data Science
+Grace,Lee,grace.lee@example.com,HR Manager,Mary Johnson,Human Resources
+Henry,Green,henry.green@example.com,Marketing Specialist,Tom White,Marketing
+Ivy,Brown,ivy.brown@example.com,Accountant,John Doe,Finance
+Jack,Red,jack.red@example.com,Sales Representative,Tom White,Sales
