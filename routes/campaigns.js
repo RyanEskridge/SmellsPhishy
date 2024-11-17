@@ -2,12 +2,12 @@ const express = require('express');
 const clerk = require
 const router = express.Router();
 const Campaigns = require('../models/Campaigns');
-const { clerkClient } = require('@clerk/clerk-sdk-node');
+const { clerkClient } = require('@clerk/express');
 
 router.get('/', async (req, res) => {
   try {
     const campaigns = await Campaigns.findAll();
-
+    true
     const plaincampaigns = campaigns.map((campaign) =>
       campaign.get({ plain: true })
     );
@@ -23,12 +23,14 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Deprecated route.
+/*
 router.get('/new', (req, res) => {
   res.render('campaigns_new', {
     title: 'Create New Campaign',
     description: 'Campaigns comprise a series of tests.'
   });
-});
+});*/
 
 router.post('/create', async (req, res) => {
   const name = req.body.name;
@@ -36,8 +38,8 @@ router.post('/create', async (req, res) => {
   const { userId } = req.auth; 
   // console.log(req.body);
   try {
-    await Campaigns.create({name, notes, owner: userId});
-    res.redirect('/campaigns');
+    const campaign = await Campaigns.create({name, notes, owner: userId});
+    res.redirect(`/campaigns/manage/${campaign.id}`);
   } catch (error) {
     console.error('Error saving campaign:', error);
     res.status(500).send('Server Error');
@@ -74,7 +76,7 @@ router.get('/manage/:id', async (req, res) => {
     }
 
     res.render('campaign_manage', {
-      title: 'Campain Manager',
+      title: 'Campaign Manager',
       description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.',
       campaign: campaign.get({plain: true}),
       user

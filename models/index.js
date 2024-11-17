@@ -1,15 +1,16 @@
-const EmailTemplate = require('./EmailTemplate');
-const Targets = require('./Targets');
-const Lists = require('./Lists');
 const Campaigns = require('./Campaigns');
-const Tests = require('Tests');
+const EmailTemplate = require('./EmailTemplate');
+const Lists = require('./Lists');
+const Targets = require('./Targets');
+const Tests = require('./Tests');
+const TestTargets = require('./TestTargets');
 
 // Export all models
 module.exports = {
-    EmailTemplate,
-    Targets,
-    Lists,
     Campaigns,
+    EmailTemplate,
+    Lists,
+    Targets,
     Tests,
     TestTargets,
 };

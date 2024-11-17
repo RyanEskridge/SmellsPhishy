@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const Targets = require('Targets')
-const Tests = require('Tests')
+//const Targets = require('./Targets')
+//const Tests = require('./Tests')
 const sequelize = require('../config/database');
 
 const TargetTests = sequelize.define('TargetTests', {
