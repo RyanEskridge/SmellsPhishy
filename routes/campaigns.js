@@ -23,15 +23,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Deprecated route.
-/*
-router.get('/new', (req, res) => {
-  res.render('campaigns_new', {
-    title: 'Create New Campaign',
-    description: 'Campaigns comprise a series of tests.'
-  });
-});*/
-
 router.post('/create', async (req, res) => {
   const name = req.body.name;
   const notes = req.body.notes;
@@ -43,6 +34,20 @@ router.post('/create', async (req, res) => {
   } catch (error) {
     console.error('Error saving campaign:', error);
     res.status(500).send('Server Error');
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const [updated] = await Campaigns.update(req.body, {
+      where: { id: req.params.id },
+    });
+    if (!updated) {
+      return res.status(404).json({ message: 'Campaign not found.' });
+    }
+    res.status(200).json({ message: 'Campaign updated successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update Campaign data.' });
   }
 });
 
@@ -70,6 +75,8 @@ router.get('/manage/:id', async (req, res) => {
   try {
     const campaign = await Campaigns.findByPk(campaignId);
     user = await clerkClient.users.getUser(campaign.owner)
+    const statusText = campaign.status ? 'Active' : 'Inactive';
+    //console.log(statusText)
 
     if (!campaign) {
       return res.status(404).send('Campaign not found.');
@@ -79,11 +86,34 @@ router.get('/manage/:id', async (req, res) => {
       title: 'Campaign Manager',
       description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.',
       campaign: campaign.get({plain: true}),
-      user
+      user,
+      statusText
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);
     res.status(500).send('Server Error')
   }
 });
+
+router.post('/toggle-status/:id', async (req, res) => {
+  const campaignId = req.params.id;
+
+  try {
+    const campaign = await Campaigns.findByPk(campaignId);
+
+    if (!campaign) {
+      return res.status(404).send('Campaign not found');
+    }
+
+    // Toggle the status
+    campaign.status = !campaign.status;
+    await campaign.save();
+
+    res.status(200).json({ status: campaign.status });
+  } catch (error) {
+    console.error('Error toggling campaign status:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
