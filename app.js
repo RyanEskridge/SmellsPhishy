@@ -8,7 +8,7 @@ const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
 
-const { EmailTemplate, Targets, Lists , Tests} = require('./models')
+const { EmailTemplate, Targets, Lists, Tests, Campaigns } = require('./models')
 
 /*
 const EmailTemplate = require('./models/EmailTemplate');
@@ -51,7 +51,7 @@ app.get('/signup', (req, res) => {
 app.use(clerkMiddleware());
 app.use(ensureAuthenticated);
 
-app.engine('hbs', exphbs.engine({ 
+app.engine('hbs', exphbs.engine({
   extname: '.hbs',
   layoutsDir: path.join(__dirname, 'views/layouts'),
   partialsDir: path.join(__dirname, 'views/partials')
@@ -80,24 +80,27 @@ app.engine(
 that have children or require additional logic. */
 
 const campaignsRouter = require('./routes/campaigns');
-const testsRouter = require('./routes/tests')
+const testsRouter = require('./routes/tests');
 const templatesRouter = require('./routes/templates');
 const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
 const mailRouter = require('./routes/mail');
 
 app.use('/campaigns', campaignsRouter);
+app.use('/tests', testsRouter);
 app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
-app.use('/tests', testsRouter)
+
+
 
 app.get('/', async (req, res) => {
   try {
-    const [templateCount, targetCount, listCount, testCount] = await Promise.all([
+    const [templateCount, targetCount, listCount, campaignCount, testCount] = await Promise.all([
       EmailTemplate.count(),
       Targets.count(),
       Lists.count(),
+      Campaigns.count(),
       Tests.count()
     ]);
 
@@ -106,6 +109,7 @@ app.get('/', async (req, res) => {
       targetCount,
       listCount,
       testCount,
+      campaignCount,
       title: 'Dashboard',
       description: 'Welcome to the dashboard'
     });
