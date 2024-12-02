@@ -8,7 +8,7 @@ const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
 
-const { EmailTemplate, Targets, Lists } = require('./models')
+const { EmailTemplate, Targets, Lists , Tests} = require('./models')
 
 /*
 const EmailTemplate = require('./models/EmailTemplate');
@@ -80,6 +80,7 @@ app.engine(
 that have children or require additional logic. */
 
 const campaignsRouter = require('./routes/campaigns');
+const testsRouter = require('./routes/tests')
 const templatesRouter = require('./routes/templates');
 const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
@@ -89,19 +90,22 @@ app.use('/campaigns', campaignsRouter);
 app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
+app.use('/tests', testsRouter)
 
 app.get('/', async (req, res) => {
   try {
-    const [templateCount, targetCount, listCount] = await Promise.all([
+    const [templateCount, targetCount, listCount, testCount] = await Promise.all([
       EmailTemplate.count(),
       Targets.count(),
-      Lists.count()
+      Lists.count(),
+      Tests.count()
     ]);
 
     res.render('dashboard', {
       templateCount,
       targetCount,
       listCount,
+      testCount,
       title: 'Dashboard',
       description: 'Welcome to the dashboard'
     });

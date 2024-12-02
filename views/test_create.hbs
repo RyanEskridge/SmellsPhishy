@@ -1,0 +1,14 @@
+<form action="/tests/create" method="POST">
+    <input type="hidden" name="camp_id" value="{{campId}}" />
+    <div class="form-group">
+        <label for="title">Test Title</label>
+        <input type="text" id="title" name="title" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="template_id">Email Template ID</label>
+        <input type="text" id="template_id" name="template_id" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Test</button>
+</form>
+
+<p class="small-italic">Campaign: {{campId}}</p>

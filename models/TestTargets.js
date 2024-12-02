@@ -4,6 +4,12 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const TargetTests = sequelize.define('TargetTests', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: () => uuidv4(),
+        primaryKey: true,
+        allowNull: false
+    },
     targetId: {
         type: DataTypes.UUID,
         allowNull: false,
