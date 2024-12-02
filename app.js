@@ -1,17 +1,21 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
-const session = require('express-session');
-const flash = require('connect-flash');
 
 const { clerkMiddleware } = require('@clerk/express');
 const { ensureAuthenticated } = require('./utils/customMiddleware');
 const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
+
+const { EmailTemplate, Targets, Lists , Tests} = require('./models')
+
+/*
 const EmailTemplate = require('./models/EmailTemplate');
 const Targets = require('./models/Targets');
 const Lists = require('./models/Lists');
+*/
+
 const { createLink } = require('./helpers/linkHelper');
 
 const app = express();
@@ -76,6 +80,7 @@ app.engine(
 that have children or require additional logic. */
 
 const campaignsRouter = require('./routes/campaigns');
+const testsRouter = require('./routes/tests')
 const templatesRouter = require('./routes/templates');
 const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
@@ -85,19 +90,22 @@ app.use('/campaigns', campaignsRouter);
 app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
+app.use('/tests', testsRouter)
 
 app.get('/', async (req, res) => {
   try {
-    const [templateCount, targetCount, listCount] = await Promise.all([
+    const [templateCount, targetCount, listCount, testCount] = await Promise.all([
       EmailTemplate.count(),
       Targets.count(),
-      Lists.count()
+      Lists.count(),
+      Tests.count()
     ]);
 
     res.render('dashboard', {
       templateCount,
       targetCount,
       listCount,
+      testCount,
       title: 'Dashboard',
       description: 'Welcome to the dashboard'
     });
@@ -138,7 +146,7 @@ app.use(mailRouter);
 
 // Synchronize all models with the database
 sequelize
-  .sync({ force: false }) // Set to false if you want persistent DB. Set to true in production (or remove line? not sure yet)
+  .sync({ force: false }) // Set to false if you want persistent DB. Remove in production.
   .then(() => {
     console.log('Database synced successfully');
   })

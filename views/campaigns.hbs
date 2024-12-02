@@ -1,21 +1,66 @@
 <style>
-    .table {width: 50%;}
-    .col-name { width: 30%; }
-    .col-description { width: 30%; }
-    .col-status { width: 1%; }
-    .alert-success { color: green; }
-    .alert-error { color: red; }
+    .table {
+        width: 50%;
+    }
+
+    .col-status {
+        width: 1%;
+    }
+
+    .alert-success {
+        color: green;
+    }
+
+    .alert-error {
+        color: red;
+    }
 </style>
 
 <h1 class='mx-2'>{{title}}</h1>
 <p class='mx-2'>{{description}}</p>
 
-<div class="camp-table my-4"><h3>Campaigns List</h3></div>
+<!-- Button trigger modal -->
+<button type="button" class="btn brand-btn" data-bs-toggle="modal" data-bs-target="#addModal" style="width: 250px;">
+    <i class="bi bi-diagram-3"></i> New Campaign
+</button>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bord-0 bg-light">
+                <h1 class="modal-title fs-5" id="exampleModalLabel"><i class="bi bi-diagram-3"></i> New Campaign</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="">
+                    <form class="p-4" action="/campaigns/create" method="POST">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Campaign Name</span>
+                            <input type="text" class="form-control" name="name" required placeholder="New Campaign">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Notes</span>
+                            <input type="text" class="form-control" name="notes">
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-dark" style="width: 180px;">Create Campaign</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Campaigns Table -->
+<div class="camp-table my-4">
+    <h3>Campaigns List</h3>
+</div>
 <table class="table table-striped mt-3">
     <thead>
         <tr>
             <th scope="col" class="col-name text-center">Name</th>
-            <th scope="col" class="col-description text-center">Description</th>
+            <th scope="col" class="col-description text-center">Notes</th>
             <th scope="col" class="col-status text-center">Status</th>
         </tr>
     </thead>
@@ -26,21 +71,22 @@
             <td class="text-center" style="vertical-align: middle;">{{this.notes}}</td>
             <td class="text-center" style="vertical-align: middle;">
                 {{#if this.status}}
-                    <span style="color: green;">&#9679;</span>
+                <span style="color: green;">&#9679;</span>
                 {{else}}
-                    <span style="color: red;">&#9679;</span>
+                <span style="color: red;">&#9679;</span>
                 {{/if}}
             </td>
             <td>
                 <button class="btn brand-btn" onclick="confirmDeletion('{{this.id}}')">
-                <i class="bi bi-trash3"></i> Delete
-            </button>
-            <form id="delete-form-{{this.id}}" action="/campaigns/delete/{{this.id}}" method="POST" style="display:none;"></form>
+                    <i class="bi bi-trash3"></i> Delete
+                </button>
+                <form id="delete-form-{{this.id}}" action="/campaigns/delete/{{this.id}}" method="POST"
+                    style="display:none;"></form>
             </td>
             <td>
                 <a href="/campaigns/manage/{{this.id}}" class="btn btn-secondary mx-2">
                     <i>Manage Campaign</i>
-            </a>
+                </a>
             </td>
         </tr>
         {{/each}}
@@ -55,4 +101,4 @@
             document.getElementById('delete-form-' + id).submit();
         }
     }
-    </script>
+</script>

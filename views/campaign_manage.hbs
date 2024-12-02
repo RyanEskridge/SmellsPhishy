@@ -1,2 +1,130 @@
-<h1 class="mx-2">{{title}}</h1>
-<p class="mx-2">{{description}}</p>
+{{> breadcrumbs }}
+<h1 class="mx-2">Managing Campaign: {{campaign.name}}</h1>
+<p class="mx-2">Notes: {{campaign.notes}}</p>
+
+<!-- Row of Buttons -->
+<div class="button-row mx-2">
+  <button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit info" data-bs-toggle="modal"
+    data-bs-target="#editInfoModal">Edit Campaign Info</button>
+  <a href="/tests/create?camp_id={{campaign.id}}" class="btn btn-primary">
+    Create New Test
+  </a>
+  <button id="toggleStatusButton" class="btn btn-warning" data-campaign-id="{{campaign.id}}">
+    Toggle Status
+  </button>
+</div>
+
+<!-- Tests Table -->
+
+<!-- Edit Info Modal -->
+<div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="editModalLabel"><i class=""></i>Edit Campaign Info</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editInfoForm">
+          <input type="hidden" id="editTargetId" name="id">
+          <div class="mb-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Campaign Name</span>
+              <input type="text" class="form-control" name="name" required value="{{campaign.name}}">
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Notes</span>
+              <input type="text" class="form-control" name="notes" value="{{campaign.notes}}">
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-dark" style="width: 180px;">Edit Campaign</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status mx-2 mt-3">
+  <p>
+    Status:
+    <strong id="statusText" class="{{#if campaign.status}}text-success{{else}}text-danger{{/if}}">
+      {{#if campaign.status}}Active{{else}}Inactive{{/if}}
+    </strong>
+  </p>
+</div>
+
+
+
+<p class="small-italic">Owner: {{user.firstName}} {{user.lastName}}</p>
+<p class="small-italic">Created: {{campaign.createdAt}}</p>
+<p class="small-italic">Updated: {{campaign.updatedAt}}</p>
+
+<script>
+  document.getElementById('editInfoForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const campaignId = "{{campaign.id}}"; // Use the current campaign's ID
+    const formData = new FormData(event.target);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch(`/campaigns/${campaignId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const newName = payload.name;
+        const newNotes = payload.notes;
+
+        document.querySelector('h1').textContent = `Managing Campaign: ${newName}`;
+        document.querySelector('p').textContent = `Notes: ${newNotes}`;
+
+        const editInfoModal = document.querySelector('#editInfoModal');
+        const modalInstance = bootstrap.Modal.getInstance(editInfoModal);
+        modalInstance.hide();
+      } else {
+        console.error('Failed to update campaign:', response.statusText);
+        alert('Error updating campaign info.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('An error occurred while updating the campaign.');
+    }
+  });
+</script>
+
+<script>
+  document.getElementById('toggleStatusButton').addEventListener('click', async function () {
+    const campaignId = this.dataset.campaignId;
+    try {
+      const response = await fetch(`/campaigns/toggle-status/${campaignId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const statusText = data.status ? 'Active' : 'Inactive';
+        const statusClass = data.status ? 'text-success' : 'text-danger';
+
+        const statusElement = document.getElementById('statusText');
+        statusElement.textContent = statusText;
+        statusElement.className = statusClass;
+      } else {
+        console.error('Failed to toggle status:', response.statusText);
+        alert('Error toggling campaign status.');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      alert('An error occurred while toggling campaign status.');
+    }
+  });
+</script>
