@@ -1,2 +1,118 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .small-input {
+        width: 150px;
+    }
+</style>
+
 <h1 class="mx-2">{{title}}</h1>
 <p class="mx-2">{{description}}</p>
+
+<div class="container mt-4">
+    <form id="scheduleEmailForm">
+        <div class="mb-3">
+            <label class="form-label">Target Type</label>
+            <div>
+                <input type="radio" id="targetListOption" name="targetType" value="list" checked>
+                <label for="targetListOption">Target List</label>
+                <input type="radio" id="individualOption" name="targetType" value="individual">
+                <label for="individualOption">Individual</label>
+            </div>
+        </div>
+        <div class="mb-3" id="targetListArea">
+            <label for="targetList" class="form-label">Target List</label>
+            <select class="form-control" id="targetList">
+                {{#each targetLists}}
+                <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="mb-3" id="individualEmailArea" style="display: none;">
+            <label for="individualEmail" class="form-label">Individual Email</label>
+            <input type="email" class="form-control" id="individualEmail" placeholder="Enter email">
+        </div>
+        <div class="mb-3">
+            <label for="emailTemplate" class="form-label">Email Template</label>
+            <select class="form-control" id="emailTemplate">
+                <option value="">Custom Content</option>
+                {{#each emailTemplates}}
+                <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="mb-3" id="customContentArea">
+            <label for="customContent" class="form-label">Custom Content</label>
+            <textarea class="form-control" id="customContent" rows="5"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="scheduledTime" class="form-label">Scheduled Time</label>
+            <input type="datetime-local" class="form-control form-control-sm small-input" id="scheduledTime" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Schedule Email</button>
+    </form>
+</div>
+
+<script>
+    document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
+        elem.addEventListener('change', function () {
+            const targetListArea = document.getElementById('targetListArea');
+            const individualEmailArea = document.getElementById('individualEmailArea');
+            if (this.value === 'list') {
+                targetListArea.style.display = 'block';
+                individualEmailArea.style.display = 'none';
+            } else {
+                targetListArea.style.display = 'none';
+                individualEmailArea.style.display = 'block';
+            }
+        });
+    });
+
+    document.getElementById('emailTemplate').addEventListener('change', function () {
+        const customContentArea = document.getElementById('customContentArea');
+        if (this.value) {
+            customContentArea.style.display = 'none';
+        } else {
+            customContentArea.style.display = 'block';
+        }
+    });
+
+    document.getElementById('scheduleEmailForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const targetType = document.querySelector('input[name="targetType"]:checked').value;
+        const targetList = document.getElementById('targetList').value;
+        const individualEmail = document.getElementById('individualEmail').value;
+        const emailTemplate = document.getElementById('emailTemplate').value;
+        const customContent = document.getElementById('customContent').value;
+        const scheduledTime = document.getElementById('scheduledTime').value;
+
+        const payload = {
+            targetType,
+            targetList: targetType === 'list' ? targetList : null,
+            individualEmail: targetType === 'individual' ? individualEmail : null,
+            emailTemplate,
+            customContent,
+            scheduledTime
+        };
+
+        try {
+            const response = await fetch('/api/schedule-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Email scheduled successfully!');
+            } else {
+                alert('Failed to schedule email.');
+            }
+        } catch (error) {
+            console.error('Error scheduling email:', error);
+            alert('An error occurred while scheduling the email.');
+        }
+    });
+</script>

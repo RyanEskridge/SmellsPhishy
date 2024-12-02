@@ -73,7 +73,7 @@ router.get('/manage/:id', async (req, res) => {
     }
 
     res.render('campaign_manage', {
-      title: 'Campain Manager',
+      title: 'Campaign Manager',
       description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.'
     });
   } catch (error) {
