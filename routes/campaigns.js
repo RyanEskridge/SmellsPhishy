@@ -13,9 +13,9 @@ router.get('/', async (req, res) => {
     );
 
     res.render('campaigns', {
-        title: 'Campaigns',
-        description: 'List of campaigns.',
-        campaigns: plaincampaigns
+      title: 'Campaigns',
+      description: 'List of campaigns.',
+      campaigns: plaincampaigns
     });
   } catch (error) {
     console.error('Error fetching campaigns:', error);
@@ -26,10 +26,10 @@ router.get('/', async (req, res) => {
 router.post('/create', async (req, res) => {
   const name = req.body.name;
   const notes = req.body.notes;
-  const { userId } = req.auth; 
+  const { userId } = req.auth;
   // console.log(req.body);
   try {
-    const campaign = await Campaigns.create({name, notes, owner: userId});
+    const campaign = await Campaigns.create({ name, notes, owner: userId });
     res.redirect(`/campaigns/manage/${campaign.id}`);
   } catch (error) {
     console.error('Error saving campaign:', error);
@@ -39,17 +39,29 @@ router.post('/create', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const [updated] = await Campaigns.update(req.body, {
-      where: { id: req.params.id },
-    });
-    if (!updated) {
+    // Fetch the existing campaign
+    const campaign = await Campaigns.findByPk(req.params.id);
+
+    if (!campaign) {
       return res.status(404).json({ message: 'Campaign not found.' });
     }
+
+    // Merge updated fields with existing fields
+    const updatedData = {
+      ...campaign.get(), // Existing data
+      ...req.body,       // Updated data from request
+    };
+
+    // Update the campaign
+    await campaign.update(updatedData);
+
     res.status(200).json({ message: 'Campaign updated successfully.' });
   } catch (error) {
+    console.error('Error updating campaign:', error);
     res.status(500).json({ message: 'Failed to update Campaign data.' });
   }
 });
+
 
 router.post('/delete/:id', async (req, res) => {
   const campaignId = req.params.id;
@@ -77,7 +89,6 @@ router.get('/manage/:id', async (req, res) => {
     user = await clerkClient.users.getUser(campaign.owner)
     const statusText = campaign.status ? 'Active' : 'Inactive';
     //console.log(statusText)
-
     if (!campaign) {
       return res.status(404).send('Campaign not found.');
     }
@@ -85,7 +96,7 @@ router.get('/manage/:id', async (req, res) => {
     res.render('campaign_manage', {
       title: 'Campaign Manager',
       description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.',
-      campaign: campaign.get({plain: true}),
+      campaign: campaign.get({ plain: true }),
       user,
       statusText
     });
