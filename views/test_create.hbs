@@ -1,14 +1,172 @@
-<form action="/tests/create" method="POST">
-    <input type="hidden" name="camp_id" value="{{campId}}" />
-    <div class="form-group">
-        <label for="title">Test Title</label>
-        <input type="text" id="title" name="title" class="form-control" required />
-    </div>
-    <div class="form-group">
-        <label for="template_id">Email Template ID</label>
-        <input type="text" id="template_id" name="template_id" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Create Test</button>
-</form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>{{title}}</title>
+    <style>
+        .small-input {
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>{{title}}</h1>
+        <p>{{description}}</p>
 
-<p class="small-italic">Campaign: {{campId}}</p>
+        <form id="newTestForm">
+            <!-- Campaign ID as a hidden field -->
+            <input type="hidden" name="camp_id" value="{{campId}}">
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Test Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter test title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Target Type</label>
+                <div>
+                    <input type="radio" id="targetListOption" name="targetType" value="list" checked>
+                    <label for="targetListOption">Target List</label>
+                    <input type="radio" id="individualOption" name="targetType" value="individual">
+                    <label for="individualOption">Individual</label>
+                </div>
+            </div>
+
+            <div class="mb-3" id="targetListArea">
+                <label for="targetList" class="form-label">Target List</label>
+                <select class="form-control" id="targetList" name="targetList">
+                    <option value="" selected disabled>SELECT</option>
+                    {{#each targetLists}}
+                    <option value="{{this.id}}">{{this.ListName}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+            <div class="mb-3" id="individualEmailArea" style="display: none;">
+                <label for="individualEmail" class="form-label">Individual Email</label>
+                <input type="email" class="form-control" id="individualEmail" name="individualEmail" placeholder="Enter email">
+            </div>
+
+            <div class="mb-3">
+                <label for="emailTemplate" class="form-label">Email Template</label>
+                <select class="form-control" id="emailTemplate" name="template_id" required>
+                    <option value="" selected>Custom Content</option>
+                    {{#each emailTemplates}}
+                    <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
+                        {{this.name}}
+                    </option>
+                    {{/each}}
+                </select>
+            </div>
+
+            <div class="mb-3" id="customContentArea">
+                <label for="customContent" class="form-label">Custom Content</label>
+                <textarea class="form-control" id="customContent" name="customContent" rows="5"></textarea>
+            </div>
+
+            <div class="mt-4" id="templatePreview" style="display: none;">
+                <h4>Template Preview</h4>
+                <p><strong>Subject:</strong> <span id="templateSubject"></span></p>
+                <p><strong>Body:</strong></p>
+                <pre id="templateBody" style="background: #f8f9fa; padding: 10px; border: 1px solid #ddd;"></pre>
+            </div>
+
+            <div class="mb-3">
+                <label for="scheduledTime" class="form-label">Scheduled Time</label>
+                <input type="datetime-local" class="form-control form-control-sm small-input" id="scheduledTime" name="scheduledTime" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Test</button>
+        </form>
+    </div>
+
+    <script>
+        // Handle target type toggle
+        document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
+            elem.addEventListener('change', function () {
+                const targetListArea = document.getElementById('targetListArea');
+                const individualEmailArea = document.getElementById('individualEmailArea');
+                if (this.value === 'list') {
+                    targetListArea.style.display = 'block';
+                    individualEmailArea.style.display = 'none';
+                } else {
+                    targetListArea.style.display = 'none';
+                    individualEmailArea.style.display = 'block';
+                }
+            });
+        });
+
+        // Handle email template change
+        document.getElementById('emailTemplate').addEventListener('change', function () {
+            const customContentArea = document.getElementById('customContentArea');
+            customContentArea.style.display = this.value ? 'none' : 'block';
+        });
+
+        // Form submission handler
+        document.getElementById('newTestForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+
+            // Prepare payload
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/tests/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Test created successfully!');
+                    window.location.href = `/campaigns/manage/${payload.camp_id}`;
+                } else {
+                    alert('Failed to create test.');
+                }
+            } catch (error) {
+                console.error('Error creating test:', error);
+                alert('An error occurred while creating the test.');
+            }
+        });
+    </script>
+
+    <script>
+        document.getElementById('emailTemplate').addEventListener('change', function () {
+            const customContentArea = document.getElementById('customContentArea');
+            if (this.value === "") {
+                customContentArea.style.display = 'block'; // Show the text box for Custom Content
+            } else {
+                customContentArea.style.display = 'none'; // Hide the text box
+            }
+        });
+    </script>
+
+    <script>
+        const emailTemplateSelect = document.getElementById('emailTemplate');
+        const customContentArea = document.getElementById('customContentArea');
+        const templatePreview = document.getElementById('templatePreview');
+        const templateSubject = document.getElementById('templateSubject');
+        const templateBody = document.getElementById('templateBody');
+
+        emailTemplateSelect.addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+
+            if (this.value === "") {
+                // Show custom content area, hide template preview
+                customContentArea.style.display = 'block';
+                templatePreview.style.display = 'none';
+            } else {
+                // Hide custom content area, show template preview
+                customContentArea.style.display = 'none';
+                templatePreview.style.display = 'block';
+
+                // Update template preview
+                templateSubject.textContent = selectedOption.dataset.subject || "N/A";
+                templateBody.textContent = selectedOption.dataset.body || "N/A";
+            }
+        });
+    </script>
+
+</body>
