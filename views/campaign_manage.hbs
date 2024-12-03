@@ -79,10 +79,14 @@
       <td>{{ title }}</td>
       <td>{{ id }}</td>
       <td>
-        {{#if this.status}}
-        <span style="color: green;">&#9679;</span>
+        {{#if status}}
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}" checked>
+        </div>
         {{else}}
-        <span style="color: red;">&#9679;</span>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}">
+        </div>
         {{/if}}
       </td>
     </tr>
@@ -160,4 +164,38 @@
       alert('An error occurred while toggling campaign status.');
     }
   });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleSwitch = document.querySelector('.form-switch');
+
+  if (toggleSwitch) {
+    toggleSwitch.addEventListener('change', (event) => {
+      const testId = event.target.getAttribute('data-test-id'); 
+      const newStatus = event.target.checked; 
+
+      fetch(`/tests/update/status/${testId}`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update status');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Status updated:', data);
+        })
+        .catch(error => {
+          console.error('Error updating status:', error);
+        });
+    });
+  }
+});
 </script>

@@ -87,6 +87,8 @@ router.get('/manage/:id', async (req, res) => {
   const campaignId = req.params.id;
   try {
     const campaign = await Campaigns.findByPk(campaignId);
+    const statusText = campaign.status ? 'Active' : 'Inactive';
+
     const tests = await Tests.findAll({
       where: {
         camp_id: campaignId
@@ -94,7 +96,7 @@ router.get('/manage/:id', async (req, res) => {
     });
     const plainTests = tests.map(test => test.get({ plain: true }));
     user = await clerkClient.users.getUser(campaign.owner)
-    const statusText = campaign.status ? 'Active' : 'Inactive';
+
     //console.log(statusText)
     if (!campaign) {
       return res.status(404).send('Campaign not found.');

@@ -57,4 +57,28 @@ router.post('/create', async (req, res) => {
     }
 });
 
+
+router.put('/update/status/:id', async (req, res) => {
+    const testId = req.params.id; 
+    const { status } = req.body;
+    console.log(`ID: ${testId}`)
+    console.log(`status: ${status}`)
+    try {
+      const test = await Tests.findByPk(testId);
+  
+      if (!test) {
+        return res.status(404).json({ error: 'Test not found' });
+      }
+  
+      test.status = status;
+      await test.save();
+  
+      res.json({ message: 'Status updated successfully', test });
+    } catch (error) {
+      console.error('Error updating test status:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+
 module.exports = router;
