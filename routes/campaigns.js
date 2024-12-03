@@ -2,6 +2,7 @@ const express = require('express');
 const clerk = require
 const router = express.Router();
 const Campaigns = require('../models/Campaigns');
+const Tests = require('../models/Tests');
 const { clerkClient } = require('@clerk/express');
 
 router.get('/', async (req, res) => {
@@ -86,6 +87,12 @@ router.get('/manage/:id', async (req, res) => {
   const campaignId = req.params.id;
   try {
     const campaign = await Campaigns.findByPk(campaignId);
+    const tests = await Tests.findAll({
+      where: {
+        camp_id: campaignId
+      },
+    });
+    const plainTests = tests.map(test => test.get({ plain: true }));
     user = await clerkClient.users.getUser(campaign.owner)
     const statusText = campaign.status ? 'Active' : 'Inactive';
     //console.log(statusText)
@@ -98,7 +105,8 @@ router.get('/manage/:id', async (req, res) => {
       description: 'Here, you can manage your campaign. Import users, create tests, set schedules, etc.',
       campaign: campaign.get({ plain: true }),
       user,
-      statusText
+      statusText,
+      tests: plainTests,
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);

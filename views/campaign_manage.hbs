@@ -1,9 +1,9 @@
 {{> breadcrumbs }}
-<h1 class="mx-2">Managing Campaign: {{campaign.name}}</h1>
-<p class="mx-2">Notes: {{campaign.notes}}</p>
+<h1 class="">Managing Campaign: {{campaign.name}}</h1>
+<p class="">Notes: {{campaign.notes}}</p>
 
 <!-- Row of Buttons -->
-<div class="button-row mx-2">
+<div class="button-row">
   <button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit info" data-bs-toggle="modal"
     data-bs-target="#editInfoModal">Edit Campaign Info</button>
   <a href="/tests/create?camp_id={{campaign.id}}" class="btn btn-primary">
@@ -13,8 +13,6 @@
     Toggle Status
   </button>
 </div>
-
-<!-- Tests Table -->
 
 <!-- Edit Info Modal -->
 <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -46,7 +44,7 @@
   </div>
 </div>
 
-<div class="status mx-2 mt-3">
+<div class="status mt-3">
   <p>
     Status:
     <strong id="statusText" class="{{#if campaign.status}}text-success{{else}}text-danger{{/if}}">
@@ -60,6 +58,41 @@
 <p class="small-italic">Owner: {{user.firstName}} {{user.lastName}}</p>
 <p class="small-italic">Created: {{campaign.createdAt}}</p>
 <p class="small-italic">Updated: {{campaign.updatedAt}}</p>
+
+
+<!-- Tests Table -->
+<div class="my-5">
+<h4>Tests</h4>
+<hr>
+{{#if tests}}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">ID</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+{{#each tests}}
+    <tr>
+      <td>{{ title }}</td>
+      <td>{{ id }}</td>
+      <td>
+        {{#if this.status}}
+        <span style="color: green;">&#9679;</span>
+        {{else}}
+        <span style="color: red;">&#9679;</span>
+        {{/if}}
+      </td>
+    </tr>
+{{/each}}
+  </tbody>
+</table>
+</div>
+{{else}}
+<p>No tests currently.</p>
+{{/if}}
 
 <script>
   document.getElementById('editInfoForm').addEventListener('submit', async function (event) {
