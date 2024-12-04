@@ -2,13 +2,13 @@ const express = require('express');
 const clerk = require
 const router = express.Router();
 const Campaigns = require('../models/Campaigns');
+const Templates = require('../models/EmailTemplate');
 const Tests = require('../models/Tests');
 const { clerkClient } = require('@clerk/express');
 
 router.get('/', async (req, res) => {
   try {
     const campaigns = await Campaigns.findAll();
-    true
     const plaincampaigns = campaigns.map((campaign) =>
       campaign.get({ plain: true })
     );
@@ -90,11 +90,12 @@ router.get('/manage/:id', async (req, res) => {
     const statusText = campaign.status ? 'Active' : 'Inactive';
 
     const tests = await Tests.findAll({
+      raw: true,
       where: {
         camp_id: campaignId
       },
     });
-    const plainTests = tests.map(test => test.get({ plain: true }));
+
     user = await clerkClient.users.getUser(campaign.owner)
 
     //console.log(statusText)
@@ -108,7 +109,7 @@ router.get('/manage/:id', async (req, res) => {
       campaign: campaign.get({ plain: true }),
       user,
       statusText,
-      tests: plainTests,
+      tests: tests
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Tests = require('../models/Tests');
+const TestTargets = require('../models/TestTargets');
 const Campaigns = require('../models/Campaigns');
 const Lists = require('../models/Lists');
 const EmailTemplate = require('../models/EmailTemplate');
@@ -45,6 +46,10 @@ router.post('/create', async (req, res) => {
             status: false,
         });
 
+        // const testTarget = await TestTargets.create({
+        //     testId: test.id,
+        // });
+
         // Handle custom content if provided
         if (!template_id && customContent) {
             console.log('Custom Content:', customContent);
@@ -80,5 +85,19 @@ router.put('/update/status/:id', async (req, res) => {
     }
   });
 
+  router.delete('/delete/:id', async (req, res) => {
+    try {
+        const deleted = await Tests.destroy({
+          where: { id: req.params.id },
+        });
+        if (!deleted) {
+          return res.status(404).json({ message: 'List not found.' });
+        }
+        res.status(200).json({ message: 'List deleted successfully.' });
+      } catch (error) {
+        res.status(500).json({ message: 'Failed to delete list.' });
+      }
+
+  });
 
 module.exports = router;

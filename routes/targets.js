@@ -22,7 +22,6 @@ router.post('/upload', upload.single('csvFile'), (req, res) => {
   });
 });
 
-
 router.get('/', async (req, res) => {
   try {
     const targets = await Targets.findAll();
