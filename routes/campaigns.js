@@ -1,9 +1,7 @@
 const express = require('express');
 const clerk = require
 const router = express.Router();
-const Campaigns = require('../models/Campaigns');
-const Templates = require('../models/EmailTemplate');
-const Tests = require('../models/Tests');
+const { EmailTemplate, Tests, Campaigns, TestTargets } = require('../models');
 const { clerkClient } = require('@clerk/express');
 
 router.get('/', async (req, res) => {
@@ -70,10 +68,24 @@ router.post('/delete/:id', async (req, res) => {
   try {
     const campaign = await Campaigns.findByPk(campaignId);
 
+    const tests = await Tests.findAll({ where: { camp_id: campaignId } });
+    
     if (!campaign) {
       return res.status(404).send('Campaign not found');
     }
 
+    // Delete TargetTests
+    const testIds = tests.map(test => test.id);
+    await TestTargets.destroy({
+        where: { testId: testIds },
+    });
+
+    // Delete Tests
+    await Tests.destroy({
+      where: { camp_id: campaignId },
+    });
+
+    // Delete Campaign
     await campaign.destroy();
 
     res.redirect('/campaigns');
@@ -88,7 +100,7 @@ router.get('/manage/:id', async (req, res) => {
   try {
     const campaign = await Campaigns.findByPk(campaignId);
     const statusText = campaign.status ? 'Active' : 'Inactive';
-
+    
     const tests = await Tests.findAll({
       raw: true,
       where: {
@@ -109,7 +121,7 @@ router.get('/manage/:id', async (req, res) => {
       campaign: campaign.get({ plain: true }),
       user,
       statusText,
-      tests: tests
+      tests: tests || [],
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);

@@ -93,9 +93,22 @@
 			</tr>
 		</thead>
 		<tbody>
+			<style>
+			td {
+			white-space: nowrap;
+			}
+
+			.td-truncate {
+			font-size: 12px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			width: 100%;
+			max-width: 0;
+			}
+			</style>
 			{{#each targets}}
 			<tr data-target-id="{{id}}">
-				<th scope="row">{{id}}</th>
+				<th scope="row" class="td-truncate">{{id}}</th>
 				<td class="name-cell">{{FirstName}}</td>
 				<td class="name-cell">{{LastName}}</td>
 				<td class="email-addr">{{EmailAddress}}</td>

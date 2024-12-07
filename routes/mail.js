@@ -51,56 +51,80 @@ router.get('/mail', async (req, res) => {
   if (meetsTimeRequirement) {
     //console.log("Time requirement met!")
   }
-  
-  // Campaigns
-  const activeCampaigns = await Campaigns.findAll({
-    raw: true,
-    where: {
-      status: true
-    }
-  });
-  
-  // Tests 
-  const activeCampaignIds = activeCampaigns.map(campaign => campaign.id);
-  const activeTests = await Tests.findAll({
-    raw: true,
-    where: {
-    camp_id: {
-        [Op.in]: activeCampaignIds, 
-      }
-    }
-  });
 
-  // Test Targets
-  const targetTests = await TestTargets.findAll(); 
-  console.log("\n TARGET TESTS \n");
-  console.log(targetTests);
+  const campaignsWithTests = async (listId) => {
+      return await Campaigns.findAll({
+          where: { status: true },
+          include: [
+              {
+                  model: Tests,
+                  include: [
+                      { model: EmailTemplate }, // Include EmailTemplate associated with Tests
+                  ],
+              },
+              {
+                  model: Lists,
+                  where: { id: listId }, // Filter Lists by the selected listId
+                  attributes: ['ListTargets'], // Include only ListTargets field
+              },
+          ],
+      });
+  };
+  
+  // Example usage
+  const result = await campaignsWithTests(selectedListId);
+  console.log(result);
+  
 
   
-  // Templates 
-  const activeTemplateIds = activeTests.map(activeTest => activeTest.template_id);
-  const activeTemplates = await EmailTemplate.findAll({
-    raw: true,
-    where: {
-      id: {
-        [Op.in]: activeTemplateIds, 
-      }
-    }
-  });
-
-  const targets = await Targets.findAll({raw: true});
-  const lists = await Lists.findAll({raw: true});
+  // // Campaigns
+  // const activeCampaigns = await Campaigns.findAll({
+  //   raw: true,
+  //   where: {
+  //     status: true
+  //   }
+  // });
   
-  const div = "\n------------------------------------------------\n";
-  console.log(div, " # CAMPAIGNS ", div );
-  for(let campaign in activeCampaigns) {
-    console.log(activeCampaigns[campaign].name);
-    for(let activeTest in activeTests) {
-      if (activeTest == '0') console.log("\n", "ASSOCIATED TESTS:", "\n",);
-      if (activeCampaigns[campaign].id == activeTests[activeTest].camp_id) 
-      console.log(activeTests[activeTest]);
-    }
-  }
+  // // Tests 
+  // const activeCampaignIds = activeCampaigns.map(campaign => campaign.id);
+  // const activeTests = await Tests.findAll({
+  //   raw: true,
+  //   where: {
+  //   camp_id: {
+  //       [Op.in]: activeCampaignIds, 
+  //     }
+  //   }
+  // });
+
+  // // Test Targets
+  // const targetTests = await TestTargets.findAll(); 
+  // console.log("\n TARGET TESTS \n");
+  // console.log(targetTests);
+
+  // // Templates 
+  // const activeTemplateIds = activeTests.map(activeTest => activeTest.template_id);
+  // const activeTemplates = await EmailTemplate.findAll({
+  //   raw: true,
+  //   where: {
+  //     id: {
+  //       [Op.in]: activeTemplateIds, 
+  //     }
+  //   }
+  // });
+
+  // const targets = await Targets.findAll({raw: true});
+  // const lists = await Lists.findAll({raw: true});
+  
+  // const div = "\n------------------------------------------------\n";
+  // console.log(div, " # CAMPAIGNS ", div );
+  // for(let campaign in activeCampaigns) {
+  //   console.log(activeCampaigns[campaign].id);
+  //   for(let activeTest in activeTests) {
+  //     if (activeTest == '0') console.log("\n", "ASSOCIATED TESTS:", "\n",);
+  //     if (activeCampaigns[campaign].id == activeTests[activeTest].camp_id) 
+  //     console.log(activeTests[activeTest]);
+  //   }
+  // }
 });
 
 module.exports = router;

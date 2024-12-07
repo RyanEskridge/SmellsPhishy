@@ -175,9 +175,9 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const toggleSwitch = document.querySelector('.form-switch');
+  const toggleSwitches = document.querySelectorAll('.form-switch');
 
-  if (toggleSwitch) {
+   toggleSwitches.forEach(toggleSwitch => {
     toggleSwitch.addEventListener('change', (event) => {
       const testId = event.target.getAttribute('data-test-id'); 
       const newStatus = event.target.checked; 
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('Error updating status:', error);
         });
     });
-  }
+   });
 });
 
 

@@ -46,8 +46,15 @@
 
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
-                <input type="email" class="form-control" id="individualEmail" name="individualEmail"
-                    placeholder="Enter email">
+                {{!-- <input type="email" class="form-control" id="individualEmail" name="individualEmail"
+                    placeholder="Enter email"> --}}
+                <select class="form-control" id="individualEmail" name="individualEmail">
+                    <option value="" selected disabled>SELECT</option>
+                    {{#each targets}}
+                    <option value="{{id}}">{{EmailAddress}}</option>
+                    {{/each}}
+                </select>
+                
             </div>
 
             <div class="mb-3">
@@ -121,6 +128,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                    console.log(payload);
 
                 if (response.ok) {
                     alert('Test created successfully!');

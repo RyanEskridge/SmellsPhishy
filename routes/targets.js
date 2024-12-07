@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Targets = require('../models/Targets');
-const Lists = require('../models/Lists');
+const { Targets, Lists } = require('../models');
 const csvProcessor = require('../helpers/csvProcessor');
 
 const multer = require('multer');
@@ -148,13 +147,13 @@ router.get('/lists/:id', async (req, res) => {
     const targets = await Targets.findAll();
     const plainTargets = targets.map(target => target.get({ plain: true }));
 
-    const selectedTargets = new Set((plainList.ListTargets || []).map(id => parseInt(id, 10)));
-
+    const selectedTargets = new Set((plainList.ListTargets || []).map(id => id.toString()));
     const targetsWithSelection = plainTargets.map(target => ({
       ...target,
-      isSelected: selectedTargets.has(target.id),
-    }));
+      isSelected: selectedTargets.has(target.id.toString()),
+    }));    
 
+    console.log(targetsWithSelection);
     res.render('list_details', {
       list: plainList,
       targets: targetsWithSelection,

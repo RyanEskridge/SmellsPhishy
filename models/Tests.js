@@ -4,6 +4,8 @@ const EmailTemplate = require('./EmailTemplate');
 const Campaigns = require('./Campaigns')
 const sequelize = require('../config/database');
 
+const Lists = require('./Lists');
+
 const Tests = sequelize.define(
     'Tests',
     {
