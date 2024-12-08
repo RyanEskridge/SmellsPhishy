@@ -35,6 +35,10 @@ const Tests = sequelize.define(
             },
             allowNull: false
         },
+        scheduled_time: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         owner: {
             type: DataTypes.TEXT,
             allowNull: false          

@@ -24,7 +24,11 @@ Tests.belongsToMany(Targets, {
 
 // Direct Associations for Join Table
 TestTargets.belongsTo(Tests, { foreignKey: 'testId' });
-TestTargets.belongsTo(Targets, { foreignKey: 'targetId' });
+TestTargets.belongsTo(Targets, { foreignKey: 'targetId' }); 
+
+Tests.belongsTo(EmailTemplate, { foreignKey: 'template_id' }); 
+EmailTemplate.hasMany(Tests, { foreignKey: 'template_id' });
+
 
 // Export all models
 module.exports = {

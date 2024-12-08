@@ -34,12 +34,13 @@ router.get('/create', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     const { camp_id, title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
-
+    console.log( scheduledTime);
     try {
         const test = await Tests.create({
             camp_id,
             title,
             template_id: template_id || null,
+            scheduled_time: scheduledTime,
             owner: req.auth.userId,
             status: false,
         });
