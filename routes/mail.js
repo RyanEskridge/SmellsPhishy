@@ -5,59 +5,83 @@ const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns } = require
 const mailHandler = require('../helpers/mailHandler');
 const { clerkClient } = require('@clerk/express');
 
-const isToday = (arbitraryDate) => {
-  const today = new Date();
-  const targetDate = new Date(arbitraryDate);
-
-  return (
-    today.getFullYear() === targetDate.getFullYear() &&
-    today.getMonth() === targetDate.getMonth() &&
-    today.getDate() === targetDate.getDate()
-  );
-};
-
-const isDaysSince = (arbitraryDate, days) => {
-  const currentDate = new Date();
-  const targetDate = new Date(arbitraryDate);
-
-  const differenceInTime = currentDate.getTime() - targetDate.getTime();
-  const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24));
-
-  return differenceInDays === days;
-};
-
 router.post('/send-email', (req, res) => {
   mailHandler.sendMail(req, res);
 });
 
-router.get('/mail', async (req, res) => { 
-  // Date/time requirements
-  const currentDatetime = new Date();
-  res.json({ datetime: currentDatetime.toISOString() });
+router.get('/mail', async (req, res) => {
+try {
+    const currentTime = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-  const arbitraryDate = '2024-11-27T00:00:00Z';
-  const period = 7;
+    const tests = await Tests.findAll({ raw: true });
+    const results = [];
 
-  const oneWeekAgo = (isDaysSince(arbitraryDate, 7) && period === 7);
-  const twoWeeksAgo = (isDaysSince(arbitraryDate, 14) && period === 14);
-  const oneMonthAgo = (isDaysSince(arbitraryDate, 30) && period === 30);
+    for (const test of tests) {
+        const scheduledTime = new Date(test.scheduled_time).getTime();
 
-  console.log('1 week ago:', oneWeekAgo);
-  console.log('2 weeks ago:', twoWeeksAgo);
-  console.log('1 month ago:', oneMonthAgo);
+        // Check if the test is within the last 24 hours
+        if (currentTime - scheduledTime <= oneDay) {
+            // Get the full EmailTemplate for this test
+            const emailTemplate = await EmailTemplate.findOne({
+                where: { id: test.template_id },
+                raw: true,
+            });
+            // Get all target data associated with the test
+            const targetAssociations = await TestTargets.findAll({
+                where: { testId: test.id },
+                raw: true,
+            });
 
-  const meetsTimeRequirement = (isToday || oneWeekAgo || twoWeeksAgo || oneMonthAgo);
+            const targetIds = targetAssociations.map((association) => association.targetId);
+            const targets = await Targets.findAll({
+                where: { id: targetIds },
+                raw: true,
+            });
 
-  if (meetsTimeRequirement) {
-    //console.log("Time requirement met!")
-  }
+            results.push({
+                template: emailTemplate, 
+                targets: targets,       
+            });
+        }
+    }
 
-  const tests = await Tests.findAll({
-    raw: true
-  });
+    results.forEach((result) => {
+        
+        const templateSubject = result.template.subject;
+        const templateBody = result.template.body;
+        const from = "admin@mediocresolutions.org"
+        
+        result.targets.forEach((target) => {   
+            const data = {
+                "target.name": `${target.FirstName} ${target.LastName}`,
+                company: "Mediocre Solutions",
+                link: "https://example.com/reset-password"
+            };
 
-  console.log(tests);
+            const updatedBody = templateBody.replace(/{([^}]+)}/g, (_, key) => data[key] || `{${key}}`);
+            
+            console.log ("\n-------------------------------------------------------------------\n");
+            console.log(`TO: ${target.EmailAddress}`);
+            console.log(`FROM: ${from}`);
+            console.log(`SUBJECT: ${templateSubject}`);
+            console.log("BODY: \n");
+            console.log(updatedBody);
+            console.log ("\n-------------------------------------------------------------------\n");
 
+            // console.log(`Job Title: ${target.JobTitle}`);
+            // console.log(`Supervisor: ${target.Supervisor}`);
+            // console.log(`Department: ${target.Department}`);
+        });
+    });
+
+    res.json(results);
+} catch (error) {
+    console.error('Error fetching mail tests:', error);
+    res.status(500).json({ message: 'Server error' });
+}
 });
+
+
 
 module.exports = router;
