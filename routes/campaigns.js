@@ -1,5 +1,5 @@
 const express = require('express');
-const clerk = require
+// const clerk = require
 const router = express.Router();
 const { EmailTemplate, Tests, Campaigns, TestTargets } = require('../models');
 const { clerkClient } = require('@clerk/express');

@@ -51,20 +51,12 @@ app.get('/signup', (req, res) => {
 app.use(clerkMiddleware());
 app.use(ensureAuthenticated);
 
-app.engine('hbs', exphbs.engine({
-  extname: '.hbs',
-  layoutsDir: path.join(__dirname, 'views/layouts'),
-  partialsDir: path.join(__dirname, 'views/partials')
-}));
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-
-app.use(breadcrumbs);
-
 app.engine(
   'hbs',
   exphbs.engine({
     extname: '.hbs',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials'),
     helpers: {
       increment: function (value) {
         return parseInt(value) + 1;
@@ -75,6 +67,12 @@ app.engine(
     }
   })
 );
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(breadcrumbs);
+
+
 
 /* Routers for crucial parts of the app
 that have children or require additional logic. */
@@ -85,12 +83,14 @@ const templatesRouter = require('./routes/templates');
 const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
 const mailRouter = require('./routes/mail');
+const settingsRouter = require('./routes/settings');
 
 app.use('/campaigns', campaignsRouter);
 app.use('/tests', testsRouter);
 app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
+app.use('/settings', settingsRouter);
 
 
 
@@ -134,13 +134,6 @@ app.post('/api/create-bitly-link', async (req, res) => {
     console.error('Error creating Bitly link:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to create Bitly link' });
   }
-});
-
-app.get('/settings', (req, res) => {
-  res.render('settings', {
-    title: 'Settings',
-    description: 'Adjust your settings here.'
-  });
 });
 
 app.use(express.json());

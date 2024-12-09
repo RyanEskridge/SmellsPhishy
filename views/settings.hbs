@@ -1,4 +1,4 @@
-{{> header}}
+{{> header }}
 
 <style>
 	.toast {
@@ -17,8 +17,20 @@
 
 <div class="container-fluid my-5 mx-0 p-0">
 	<div class="row">
-		<div class="col-6">
-
+			<div class="col-6">
+			<!-- Company Name Settings Section -->
+				<div class="border rounded-2 p-5 mb-3">
+					<h5>Company Name</h5>
+					<div class="input-group mt-3 mb-3">
+						<input type="url" id="companyName" class="form-control" placeholder="Enter Company Name"
+							aria-label="Company Name" aria-describedby="company-name-settings" />
+					</div>
+					{{!-- <div class="d-flex justify-content-start">
+						<button id="saveCustomLinkBtn" type="button" class="btn btn-dark">Save</button>
+					</div> --}}
+				</div>
+			</div>
+			<div class="col-6">
 			<!-- Mailgun API Key Section -->
 			<div class="border rounded-2 p-5 mb-3">
 				<h5>Mailgun API Key</h5>
@@ -27,23 +39,23 @@
 						aria-label="Mailgun API Key" aria-describedby="mg-api-key" />
 					<span class="input-group-text bg-dark text-white" id="mg-api-key"><i class="bi bi-eye"></i></span>
 				</div>
-				<div class="d-flex justify-content-start">
+				{{!-- <div class="d-flex justify-content-start">
 					<button id="saveMailgunKeyBtn" type="button" class="btn btn-dark">Save</button>
-				</div>
+				</div> --}}
 			</div>
 		</div>		
 
 		<!-- Link Settings Section -->
 		<div class="col-6">
-			<div class="border rounded-2 p-5 mb-3">
+			<div class="border rounded-2 p-5" style="height: 290px;">
 				<h5>Link Settings</h5>
 				<div class="input-group mt-3 mb-3">
-					<input type="url" id="linkHolder" class="form-control" placeholder="Enter custom link"
+					<input type="url" id="linkHolder" class="form-control" pattern="https?://.*" placeholder="Enter custom link"
 						aria-label="Custom Link" aria-describedby="link-settings" />
 				</div>
-				<div class="d-flex justify-content-start">
+				{{!-- <div class="d-flex justify-content-start">
 					<button id="saveCustomLinkBtn" type="button" class="btn btn-dark">Save</button>
-				</div>
+				</div> --}}
 			</div>
 		</div>
 		
@@ -65,8 +77,10 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
+		<div class="d-flex justify-content-start my-3">
+			<button id="saveSettings" type="button" class="btn btn-dark d-block" style="width:180px;">Save</button>
+		</div>
 </div>
 
 <!-- Toast for Mailgun API Key -->
@@ -109,9 +123,9 @@
 </div>
 
 <script>
-	const fakeKey = '6a53edf24a8d7698710adc470115b90';
 	const visibility = document.getElementById("mg-api-key");
-	const keyHolder = document.getElementById("keyHolder"); keyHolder.value = fakeKey;
+	const keyHolder = document.getElementById("keyHolder"); 
+	//keyHolder.value = fakeKey;
 	const eyeOpen = '<i class="bi bi-eye"></i>';
 	const eyeClosed = '<i class="bi bi-eye-slash"></i>';
 	let hidden = true;
@@ -126,19 +140,6 @@
 		}
 	});
 
-	document.getElementById("saveMailgunKeyBtn").onclick = function () {
-		var toast = new bootstrap.Toast(document.getElementById('mailgunToast'));
-		toast.show();
-	}
-
-	document.getElementById("saveCustomLinkBtn").onclick = function () {
-		const link = linkHolder.value;
-		if (link) {
-			localStorage.setItem('savedLink', link);
-			var toast = new bootstrap.Toast(document.getElementById('linkToast'));
-			toast.show();
-		}
-	}
 
 	document.getElementById('createBitlyLinkBtn').addEventListener('click', async () => {
 		const url = document.getElementById('bitlyLinkUrl').value;
@@ -178,4 +179,32 @@
 		document.execCommand('copy');
 		alert('Copied the link: ' + linkInput.value);
 	});
+</script>
+
+<script>
+  $(document).ready(function(){
+	const cLink = document.getElementById('linkHolder');
+	const aKey = document.getElementById('keyHolder');
+	const companyName = document.getElementById('companyName');
+
+	cLink.value = `{{settings.CustomLink}}`;
+	aKey.value = `{{settings.ApiKey}}`;
+	companyName.value = `{{settings.CompanyName}}`;
+
+
+  });
+  document.getElementById('saveSettings').addEventListener('click', function(event) {
+	const CustomLink = document.getElementById('linkHolder').value;
+	const ApiKey = document.getElementById('keyHolder').value;
+	const CompanyName = document.getElementById('companyName').value;
+    fetch(`/settings/save`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ CompanyName, ApiKey, CustomLink })
+    })
+    .then(response => response.ok ? alert('Settings updated successfully.') : alert('Failed to update settings.'))
+    .catch(error => console.error('Error updating list:', error));
+  });
 </script>

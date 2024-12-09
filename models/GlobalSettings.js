@@ -9,6 +9,10 @@ const GlobalSettings = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
+    CompanyName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     ApiKey: {
       type: DataTypes.STRING,
       allowNull: false

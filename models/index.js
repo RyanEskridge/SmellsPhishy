@@ -4,6 +4,8 @@ const Lists = require('./Lists');
 const Targets = require('./Targets');
 const TestTargets = require('./TestTargets');
 const Tests = require('./Tests');
+const GlobalSettings = require('./GlobalSettings');
+
 
 // One-to-Many: Tests belong to Campaigns
 Tests.belongsTo(Campaigns, { foreignKey: 'camp_id' });
@@ -38,4 +40,5 @@ module.exports = {
     Targets,
     Tests,
     TestTargets,
+    GlobalSettings,
 };
