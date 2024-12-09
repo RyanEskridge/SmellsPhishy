@@ -40,6 +40,7 @@ router.post('/create', async (req, res) => {
             title,
             template_id: template_id || null,
             list_id: targetList,
+            list_id: targetList,
             scheduled_time: scheduledTime,
             owner: req.auth.userId,
             status: false,
