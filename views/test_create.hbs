@@ -59,7 +59,7 @@
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2" id="emailTemplate" name="template_id" required>
-                    <option value="" selected>Custom Content</option>
+                    <option value="custom" selected>Custom Content</option>
                     {{#each emailTemplates}}
                     <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
                         {{this.name}}
@@ -90,26 +90,56 @@
         </form>
     </div>
 
-    <script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Select2
+        $('.select2').select2({
+            width: '100%',
+            placeholder: 'Search or select an option',
+            allowClear: true
+        });
+
+        const targetListArea = document.getElementById('targetListArea');
+        const individualEmailArea = document.getElementById('individualEmailArea');
+        const customContentArea = document.getElementById('customContentArea');
+        const emailTemplate = document.getElementById('emailTemplate');
+        const templatePreview = document.getElementById('templatePreview');
+        const templateSubject = document.getElementById('templateSubject');
+        const templateBody = document.getElementById('templateBody');
+
         // Handle target type toggle
         document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
-            elem.addEventListener('change', function () {
-                const targetListArea = document.getElementById('targetListArea');
-                const individualEmailArea = document.getElementById('individualEmailArea');
-                if (this.value === 'list') {
-                    targetListArea.style.display = 'block';
-                    individualEmailArea.style.display = 'none';
-                } else {
-                    targetListArea.style.display = 'none';
-                    individualEmailArea.style.display = 'block';
-                }
+            elem.addEventListener('change', () => {
+                const isList = elem.value === 'list';
+                targetListArea.style.display = isList ? 'block' : 'none';
+                individualEmailArea.style.display = isList ? 'none' : 'block';
             });
         });
 
+        // Update template preview visibility
+        const updateTemplatePreview = () => {
+            const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
+            const templateId = selectedOption.value;
+
+           if (templateId === "custom") { // Explicitly handle "Custom Content"
+                customContentArea.style.display = 'block';
+                templatePreview.style.display = 'none';
+            } else {
+                customContentArea.style.display = 'none';
+                templatePreview.style.display = 'block';
+                templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+                templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
+            }
+        };
+
+
+        // Initialize template preview
+        updateTemplatePreview();
+
         // Handle email template change
-        document.getElementById('emailTemplate').addEventListener('change', function () {
-            const customContentArea = document.getElementById('customContentArea');
-            customContentArea.style.display = this.value ? 'none' : 'block';
+        $('#emailTemplate').on('change.select2', () => {
+            
+            updateTemplatePreview();
         });
 
         // Form submission handler
@@ -117,16 +147,6 @@
             event.preventDefault();
 
             const formData = new FormData(event.target);
-
-            const targetType = formData.get('targetType');
-            if (targetType === 'list') {
-                const listId = document.getElementById('targetList').value;
-                if (!listId) {
-                    alert('Please select a target list.');
-                    return;
-                }
-                formData.set('list_id', listId);
-            }
 
             // Prepare payload
             const payload = Object.fromEntries(formData.entries());
@@ -137,7 +157,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                    console.log(payload);
 
                 if (response.ok) {
                     alert('Test created successfully!');
@@ -150,35 +169,6 @@
                 alert('An error occurred while creating the test.');
             }
         });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-        $('.select2').select2({
-            width: '100%',
-            placeholder: 'Search or select an option',
-            allowClear: true
-        });
-
-        $('#emailTemplate').on('change', function () {
-            const selectedOption = $(this).find(':selected');
-            const templateId = selectedOption.val(); 
-            const customContentArea = $('#customContentArea');
-            const templatePreview = $('#templatePreview');
-            const templateSubject = $('#templateSubject');
-            const templateBody = $('#templateBody');
-
-            if (!templateId) {
-                customContentArea.show();
-                templatePreview.hide();
-            } else {
-                customContentArea.hide();
-                templatePreview.show();
-                templateSubject.text(selectedOption.data('subject') || 'N/A');
-                templateBody.text(selectedOption.data('body') || 'N/A');
-            }
-        });
     });
-
-    </script>
+</script>
 </body>

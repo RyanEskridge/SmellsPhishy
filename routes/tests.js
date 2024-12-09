@@ -25,7 +25,7 @@ router.get('/create', async (req, res) => {
             campaign: campaign.get({ plain: true }),
             targetLists: targetLists.map((list) => list.get({ plain: true })),
             emailTemplates: emailTemplates.map((template) => template.get({ plain: true })),
-        });
+        });campId
     } catch (error) {
         console.error('Error fetching data for test creation:', error);
         res.status(500).send('Server Error');
@@ -34,7 +34,6 @@ router.get('/create', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     const { camp_id, title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
-    console.log( scheduledTime);
     try {
         const test = await Tests.create({
             camp_id,
@@ -57,14 +56,11 @@ router.post('/create', async (req, res) => {
           }
 
           const targets = list.ListTargets;
-          console.log('ListTargets:', list.ListTargets);
           const testId = test.id;
           const testTargets = targets.map(targetId => ({
             targetId: targetId,
             testId: testId,
           }));
-
-          console.log("testTargets: ", testTargets);
           
           await TestTargets.bulkCreate(testTargets);
         } 
@@ -80,11 +76,11 @@ router.post('/create', async (req, res) => {
           }
 
           await TestTargets.bulkCreate(testTargets);
-          console.log(individualEmail);
         }
       
         // Handle custom content if provided
         if (!template_id && customContent) {
+            // TODO
             console.log('Custom Content:', customContent);
         }
 
@@ -99,8 +95,6 @@ router.post('/create', async (req, res) => {
 router.put('/update/status/:id', async (req, res) => {
     const testId = req.params.id; 
     const { status } = req.body;
-    console.log(`ID: ${testId}`)
-    console.log(`status: ${status}`)
     try {
       const test = await Tests.findByPk(testId);
   
@@ -153,11 +147,9 @@ router.put('/update/status/:id', async (req, res) => {
       const targetLists = await Lists.findAll();
       const emailTemplates = await EmailTemplate.findAll();
       const allTargets = await Targets.findAll();
-
       res.render('test_edit', {
         title: 'Edit Test',
         description: 'Update the test details below.',
-        campaign: campaign.get({ plain: true }),
         test: test.get({ plain: true }),
         targets: allTargets.map((target) => target.get({ plain: true })),
         targetLists: targetLists.map((list) => list.get({ plain: true })),
@@ -172,7 +164,6 @@ router.put('/update/status/:id', async (req, res) => {
 router.put('/update/:id', async (req, res) => {
   const testId = req.params.id;
   const { title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
-
   try {
     // Find the test by ID
     const test = await Tests.findByPk(testId);
@@ -226,6 +217,7 @@ router.put('/update/:id', async (req, res) => {
 
     // Handle Custom Content
     if (!template_id && customContent) {
+      // TODO: Update db instead of logging.
       console.log('Custom Content:', customContent);
     }
 

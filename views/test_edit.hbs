@@ -1,4 +1,6 @@
+
 <head>
+    <!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -19,7 +21,8 @@
 
         <form id="newTestForm">
             <!-- Campaign ID as a hidden field -->
-            <input type="hidden" name="camp_id" value="{{campId}}">
+            <input type="hidden" name="testId" value="{{test.id}}">
+            <input type="hidden" name="camp_id" value="{{test.camp_id}}">
 
             <div class="mb-3">
                 <label for="title" class="form-label">Test Title</label>
@@ -52,20 +55,20 @@
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
                 <select class="form-control select2" id="individualEmail" name="individualEmail">
-                    <option value="" disabled>SELECT</option>
+                    <option value="" disabled {{#unless test.individualEmail}}selected{{/unless}}>SELECT</option>
                     {{#each targets}}
-                    <option value="{{this.id}}" {{#eq ../test.individualEmail this.id}}selected{{/eq}}>
-                        {{EmailAddress}}
-                    </option>
+                        <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
+                            {{EmailAddress}}
+                        </option>
                     {{/each}}
                 </select>
-
             </div>
+
 
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2" id="emailTemplate" name="template_id" required>
-                    <option value="" {{#unless test.template_id}}selected{{/unless}}>Custom Content</option>
+                   <option value="custom" data-subject="" data-body="">Custom Content</option>
                     {{#each emailTemplates}}
                         <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}" 
                             {{#if (eq ../test.template_id this.id)}}selected{{/if}}>
@@ -105,25 +108,54 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Select2
+        $('.select2').select2({
+            width: '100%',
+            placeholder: 'Search or select an option',
+            allowClear: true
+        });
+
+        const targetListArea = document.getElementById('targetListArea');
+        const individualEmailArea = document.getElementById('individualEmailArea');
+        const customContentArea = document.getElementById('customContentArea');
+        const emailTemplate = document.getElementById('emailTemplate');
+        const templatePreview = document.getElementById('templatePreview');
+        const templateSubject = document.getElementById('templateSubject');
+        const templateBody = document.getElementById('templateBody');
+
         // Handle target type toggle
         document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
-            elem.addEventListener('change', function () {
-                const targetListArea = document.getElementById('targetListArea');
-                const individualEmailArea = document.getElementById('individualEmailArea');
-                if (this.value === 'list') {
-                    targetListArea.style.display = 'block';
-                    individualEmailArea.style.display = 'none';
-                } else {
-                    targetListArea.style.display = 'none';
-                    individualEmailArea.style.display = 'block';
-                }
+            elem.addEventListener('change', () => {
+                const isList = elem.value === 'list';
+                targetListArea.style.display = isList ? 'block' : 'none';
+                individualEmailArea.style.display = isList ? 'none' : 'block';
             });
         });
 
+        // Update template preview visibility
+        const updateTemplatePreview = () => {
+            const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
+            const templateId = selectedOption.value;
+
+           if (templateId === "custom") { // Explicitly handle "Custom Content"
+                customContentArea.style.display = 'block';
+                templatePreview.style.display = 'none';
+            } else {
+                customContentArea.style.display = 'none';
+                templatePreview.style.display = 'block';
+                templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+                templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
+            }
+        };
+
+
+        // Initialize template preview
+        updateTemplatePreview();
+
         // Handle email template change
-        document.getElementById('emailTemplate').addEventListener('change', function () {
-            const customContentArea = document.getElementById('customContentArea');
-            customContentArea.style.display = this.value ? 'none' : 'block';
+        $('#emailTemplate').on('change.select2', () => {
+            
+            updateTemplatePreview();
         });
 
         // Form submission handler
@@ -131,19 +163,18 @@
             event.preventDefault();
 
             const formData = new FormData(event.target);
-
             const testId = formData.get('testId');
+
             if (!testId) {
                 alert('Test ID is missing!');
                 return;
             }
 
-            // Prepare payload
             const payload = Object.fromEntries(formData.entries());
 
             try {
                 const response = await fetch(`/tests/update/${testId}`, {
-                    method: 'PUT', 
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -162,51 +193,4 @@
     });
 </script>
 
-
-    <script>
-        $(document).ready(function () {
-        $('.select2').select2({
-            width: '100%',
-            placeholder: 'Search or select an option',
-            allowClear: true
-        });
-
-        // run after Select2 is initialized
-        setTimeout(() => {
-            const selectedOption = $('#emailTemplate').find(':selected');
-            const templateId = selectedOption.val();
-            const customContentArea = $('#customContentArea');
-            const templatePreview = $('#templatePreview');
-            const templateSubject = $('#templateSubject');
-            const templateBody = $('#templateBody');
-
-            if (!templateId) {
-                customContentArea.show();
-                templatePreview.hide();
-            } else {
-                customContentArea.hide();
-                templatePreview.show();
-                templateSubject.text(selectedOption.data('subject') || 'N/A');
-                templateBody.text(selectedOption.data('body') || 'N/A');
-            }
-        }, 0);
-
-        $('#emailTemplate').on('change', function () {
-            const selectedOption = $(this).find(':selected');
-            const templateId = selectedOption.val();
-
-            if (!templateId) {
-                customContentArea.show();
-                templatePreview.hide();
-            } else {
-                customContentArea.hide();
-                templatePreview.show();
-                templateSubject.text(selectedOption.data('subject') || 'N/A');
-                templateBody.text(selectedOption.data('body') || 'N/A');
-            }
-        });
-    });
-
-
-    </script>
 </body>
