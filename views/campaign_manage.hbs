@@ -73,29 +73,35 @@
       <th scope="col">Owner</th>
       <th scope="col">Status</th>
       <th scope="col">Delete</th>
+      <th scope="col">Edit</th>
     </tr>
   </thead>
   <tbody>
 {{#each tests}}
     <tr>
-      <td>{{ title }}</td>
-      <td>{{ id }}</td>
-      <td>{{ owner }}</td>
-      <td>
-        {{#if status}}
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}" checked>
-        </div>
-        {{else}}
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}">
-        </div>
-        {{/if}}
-      </td>
-      <td>
-        <button data-test-id="{{id}}" class="delete-test btn brand-btn"><i class="bi bi-trash3"></i></button>
-      </td>
-    </tr>
+        <td>{{ title }}</td>
+        <td>{{ id }}</td>
+        <td>{{ owner }}</td>
+        <td>
+            {{#if status}}
+            <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}" checked>
+            </div>
+            {{else}}
+            <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}">
+            </div>
+            {{/if}}
+        </td>
+        <td>
+            <button data-test-id="{{id}}" class="delete-test btn brand-btn"><i class="bi bi-trash3"></i></button>
+        </td>
+        <td>
+            <button class="btn brand-btn" onclick="window.location.href='/tests/edit/{{this.id}}'">
+                <i class="bi bi-pen"></i>
+            </button>
+        </td>
+        </tr>
 {{/each}}
   </tbody>
 </table>

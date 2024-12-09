@@ -40,6 +40,7 @@ router.post('/create', async (req, res) => {
             camp_id,
             title,
             template_id: template_id || null,
+            list_id: targetList,
             scheduled_time: scheduledTime,
             owner: req.auth.userId,
             status: false,
@@ -138,5 +139,101 @@ router.put('/update/status/:id', async (req, res) => {
       }
 
   });
+
+  router.get('/edit/:id', async (req, res) => {
+    const testId = req.params.id;
+
+    try {
+      const test = await Tests.findByPk(testId);
+
+      if (!test) {
+        return res.status(404).send('Test not found');
+      }
+
+      const targetLists = await Lists.findAll();
+      const emailTemplates = await EmailTemplate.findAll();
+      const allTargets = await Targets.findAll();
+
+      res.render('test_edit', {
+        title: 'Edit Test',
+        description: 'Update the test details below.',
+        campaign: campaign.get({ plain: true }),
+        test: test.get({ plain: true }),
+        targets: allTargets.map((target) => target.get({ plain: true })),
+        targetLists: targetLists.map((list) => list.get({ plain: true })),
+        emailTemplates: emailTemplates.map((template) => template.get({ plain: true })),
+      });
+    } catch (error) {
+      console.error('Error fetching test:', error);
+      res.status(500).send('Server Error');
+    }
+});
+
+router.put('/update/:id', async (req, res) => {
+  const testId = req.params.id;
+  const { title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
+
+  try {
+    // Find the test by ID
+    const test = await Tests.findByPk(testId);
+    if (!test) {
+      return res.status(404).json({ message: 'Test not found' });
+    }
+
+    // Update the test details
+    await test.update({
+      title,
+      template_id: template_id || null,
+      list_id: targetList || null,
+      scheduled_time: scheduledTime
+    });
+
+    // Clear previous test targets
+    await TestTargets.destroy({ where: { testId } });
+
+    // Handle Target List
+    if (targetList) {
+      const list = await Lists.findOne({
+        where: { id: targetList },
+        attributes: ['ListTargets']
+      });
+
+      if (!list || !list.ListTargets?.length) {
+        return res.status(404).json({ message: 'Target list not found or empty' });
+      }
+
+      const targets = list.ListTargets;
+      const testTargets = targets.map(targetId => ({
+        targetId: targetId,
+        testId: test.id
+      }));
+
+      await TestTargets.bulkCreate(testTargets);
+    }
+
+    // Handle Individual Email
+    if (individualEmail) {
+      const target = await Targets.findOne({ where: { id: individualEmail } });
+      if (!target) {
+        return res.status(404).json({ message: 'Target not found' });
+      }
+
+      await TestTargets.create({
+        targetId: target.id,
+        testId: test.id
+      });
+    }
+
+    // Handle Custom Content
+    if (!template_id && customContent) {
+      console.log('Custom Content:', customContent);
+    }
+
+    res.status(200).json({ message: 'Test updated successfully', test });
+  } catch (error) {
+    console.error('Error updating test:', error);
+    res.status(500).json({ message: 'Failed to update test', error: error.message });
+  }
+});
 
 module.exports = router;

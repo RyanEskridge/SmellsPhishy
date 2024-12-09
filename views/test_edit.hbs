@@ -23,7 +23,7 @@
 
             <div class="mb-3">
                 <label for="title" class="form-label">Test Title</label>
-                <input type="text" id="title" name="title" class="form-control" placeholder="Enter test title" required>
+                <input type="text" id="title" name="title" class="form-control" value="{{test.title}}"placeholder="Enter test title" required>
             </div>
 
             <div class="mb-3">
@@ -39,31 +39,38 @@
             <div class="mb-3" id="targetListArea">
                 <label for="targetList" class="form-label">Target List</label>
                 <select class="form-control select2" id="targetList" name="targetList">
-                    <option value="" selected disabled>SELECT</option>
+                    <option value="" disabled>SELECT</option>
                     {{#each targetLists}}
-                    <option value="{{this.id}}">{{this.ListName}}</option>
+                        <option value="{{this.id}}" {{#if (eq ../test.list_id this.id)}}selected{{/if}}>
+                            {{this.ListName}}
+                        </option>
                     {{/each}}
                 </select>
             </div>
 
+
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
                 <select class="form-control select2" id="individualEmail" name="individualEmail">
-                    <option value="" selected disabled>SELECT</option>
+                    <option value="" disabled>SELECT</option>
                     {{#each targets}}
-                    <option value="{{id}}">{{EmailAddress}}</option>
+                    <option value="{{this.id}}" {{#eq ../test.individualEmail this.id}}selected{{/eq}}>
+                        {{EmailAddress}}
+                    </option>
                     {{/each}}
                 </select>
+
             </div>
 
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2" id="emailTemplate" name="template_id" required>
-                    <option value="" selected>Custom Content</option>
+                    <option value="" {{#unless test.template_id}}selected{{/unless}}>Custom Content</option>
                     {{#each emailTemplates}}
-                    <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
-                        {{this.name}}
-                    </option>
+                        <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}" 
+                            {{#if (eq ../test.template_id this.id)}}selected{{/if}}>
+                            {{this.name}}
+                        </option>
                     {{/each}}
                 </select>
             </div>
@@ -82,15 +89,22 @@
 
             <div class="mb-3">
                 <label for="scheduledTime" class="form-label">Scheduled Time</label>
-                <input type="datetime-local" class="form-control form-control-sm small-input" id="scheduledTime"
-                    name="scheduledTime" required>
+                <input
+                    type="datetime-local"
+                    class="form-control form-control-sm small-input"
+                    id="scheduledTime"
+                    name="scheduledTime"
+                    value="{{test.scheduled_time}}"
+                    required
+                >
             </div>
 
-            <button type="submit" class="btn btn-primary">Create Test</button>
+            <button type="submit" class="btn btn-primary">Update Test</button>
         </form>
     </div>
 
-    <script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
         // Handle target type toggle
         document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
             elem.addEventListener('change', function () {
@@ -118,39 +132,36 @@
 
             const formData = new FormData(event.target);
 
-            const targetType = formData.get('targetType');
-            if (targetType === 'list') {
-                const listId = document.getElementById('targetList').value;
-                if (!listId) {
-                    alert('Please select a target list.');
-                    return;
-                }
-                formData.set('list_id', listId);
+            const testId = formData.get('testId');
+            if (!testId) {
+                alert('Test ID is missing!');
+                return;
             }
 
             // Prepare payload
             const payload = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('/tests/create', {
-                    method: 'POST',
+                const response = await fetch(`/tests/update/${testId}`, {
+                    method: 'PUT', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                    console.log(payload);
 
                 if (response.ok) {
-                    alert('Test created successfully!');
+                    alert('Test updated successfully!');
                     window.location.href = `/campaigns/manage/${payload.camp_id}`;
                 } else {
-                    alert('Failed to create test.');
+                    alert('Failed to update test.');
                 }
             } catch (error) {
-                console.error('Error creating test:', error);
-                alert('An error occurred while creating the test.');
+                console.error('Error updating test:', error);
+                alert('An error occurred while updating the test.');
             }
         });
-    </script>
+    });
+</script>
+
 
     <script>
         $(document).ready(function () {
@@ -160,9 +171,10 @@
             allowClear: true
         });
 
-        $('#emailTemplate').on('change', function () {
-            const selectedOption = $(this).find(':selected');
-            const templateId = selectedOption.val(); 
+        // run after Select2 is initialized
+        setTimeout(() => {
+            const selectedOption = $('#emailTemplate').find(':selected');
+            const templateId = selectedOption.val();
             const customContentArea = $('#customContentArea');
             const templatePreview = $('#templatePreview');
             const templateSubject = $('#templateSubject');
@@ -177,8 +189,24 @@
                 templateSubject.text(selectedOption.data('subject') || 'N/A');
                 templateBody.text(selectedOption.data('body') || 'N/A');
             }
+        }, 0);
+
+        $('#emailTemplate').on('change', function () {
+            const selectedOption = $(this).find(':selected');
+            const templateId = selectedOption.val();
+
+            if (!templateId) {
+                customContentArea.show();
+                templatePreview.hide();
+            } else {
+                customContentArea.hide();
+                templatePreview.show();
+                templateSubject.text(selectedOption.data('subject') || 'N/A');
+                templateBody.text(selectedOption.data('body') || 'N/A');
+            }
         });
     });
+
 
     </script>
 </body>

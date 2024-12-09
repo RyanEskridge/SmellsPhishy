@@ -35,6 +35,14 @@ const Tests = sequelize.define(
             },
             allowNull: false
         },
+        list_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: Lists,
+                key: 'id'
+            },
+        },
         scheduled_time: {
             type: DataTypes.INTEGER,
             allowNull: false
