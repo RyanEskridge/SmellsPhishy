@@ -114,88 +114,74 @@
         allowClear: true
     });
 
+    const testData = {
+        listId: "{{test.list_id}}",
+        individualEmail: "{{test.individualEmail}}",
+    };
+
     const targetListArea = document.getElementById('targetListArea');
     const targetListSelect = document.getElementById('targetList');
     const individualEmailArea = document.getElementById('individualEmailArea');
     const individualEmailSelect = document.getElementById('individualEmail');
+    const targetTypeRadios = document.querySelectorAll('input[name="targetType"]');
 
-    // Preselect Initial State
-    const targetType = document.querySelector('input[name="targetType"]:checked')?.value;
-    const selectedTargetList = targetListSelect.value;
-    const selectedIndividualEmail = individualEmailSelect.value;
+    // Preselect based on the test's targetType
+    const targetType = testData.listId ? 'list' : 'individual';
+    console.log(testData)
+    console.log(targetType)
 
-    //console.log('Initial Target Type:', targetType);
-    //console.log('Selected Target List:', selectedTargetList);
-    //console.log('Selected Individual Email:', selectedIndividualEmail);
-
-    if (targetType === 'list' && selectedTargetList) {
-        // Show target list area, hide individual email area
+    if (targetType === 'list') {
+        document.getElementById('targetListOption').checked = true;
         targetListArea.style.display = 'block';
         individualEmailArea.style.display = 'none';
-        $(targetListSelect).val(selectedTargetList).trigger('change');
-    } else if (targetType === 'individual' && selectedIndividualEmail) {
-        // Show individual email area, hide target list area
+    } else {
+        document.getElementById('individualOption').checked = true;
         targetListArea.style.display = 'none';
         individualEmailArea.style.display = 'block';
-        $(individualEmailSelect).val(selectedIndividualEmail).trigger('change');
-    } else {
-        // Default state: hide both areas
-        targetListArea.style.display = 'none';
-        individualEmailArea.style.display = 'none';
     }
 
     // Handle target type toggle
-    document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
+    targetTypeRadios.forEach((elem) => {
         elem.addEventListener('change', () => {
             const isList = elem.value === 'list';
-
-            console.log('Target Type Changed to:', elem.value);
-
-            // Toggle visibility
             targetListArea.style.display = isList ? 'block' : 'none';
             individualEmailArea.style.display = isList ? 'none' : 'block';
 
-            // Clear the opposite field's selection
             if (isList) {
                 individualEmailSelect.value = ''; // Clear individual email selection
-                $(individualEmailSelect).trigger('change'); 
+                $(individualEmailSelect).trigger('change');
             } else {
                 targetListSelect.value = ''; // Clear target list selection
-                $(targetListSelect).trigger('change'); 
+                $(targetListSelect).trigger('change');
             }
-        });
-
-        // Update template preview visibility
-        const updateTemplatePreview = () => {
-            const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
-            const templateId = selectedOption.value;
-
-           if (templateId === "custom") { // Explicitly handle "Custom Content"
-                customContentArea.style.display = 'block';
-                templatePreview.style.display = 'none';
-            } else {
-                customContentArea.style.display = 'none';
-                templatePreview.style.display = 'block';
-                templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
-                templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
-            }
-        };
-
-
-        // Initialize template preview
-        updateTemplatePreview();
-
-        // Handle email template change
-        $('#emailTemplate').on('change.select2', () => {
-            
-            updateTemplatePreview();
         });
     });
+
+    // Update template preview visibility
+    const updateTemplatePreview = () => {
+        const emailTemplate = document.getElementById('emailTemplate');
+        const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
+        const templateId = selectedOption.value;
+
+        if (templateId === "custom") {
+            document.getElementById('customContentArea').style.display = 'block';
+            document.getElementById('templatePreview').style.display = 'none';
+        } else {
+            document.getElementById('customContentArea').style.display = 'none';
+            document.getElementById('templatePreview').style.display = 'block';
+            document.getElementById('templateSubject').textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+            document.getElementById('templateBody').textContent = selectedOption.getAttribute('data-body') || 'N/A';
+        }
+    };
+
+    updateTemplatePreview();
+
+    $('#emailTemplate').on('change.select2', updateTemplatePreview);
+
+    // Handle form submission
     document.getElementById('newTestForm').addEventListener('submit', async (event) => {
         event.preventDefault();
-
         const formData = new FormData(event.target);
-
         const testId = formData.get('testId');
         const targetType = formData.get('targetType');
 
@@ -209,8 +195,6 @@
         }
 
         const payload = Object.fromEntries(formData.entries());
-        console.log('Payload:', payload);
-        console.log('test');
         try {
             const response = await fetch(`/tests/update/${testId}`, {
                 method: 'PUT',
@@ -222,7 +206,6 @@
                 alert('Test updated successfully!');
                 window.location.href = `/campaigns/manage/${payload.camp_id}`;
             } else {
-                console.log(response);
                 alert('Failed to update test.');
             }
         } catch (error) {
@@ -231,7 +214,6 @@
         }
     });
 });
-
 </script>
 
 </body>
