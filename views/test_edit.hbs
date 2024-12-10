@@ -98,8 +98,7 @@
                     id="scheduledTime"
                     name="scheduledTime"
                     value="{{test.scheduled_time}}"
-                    required
-                >
+                    required>
             </div>
 
             <button type="submit" class="btn btn-primary">Update Test</button>
@@ -159,10 +158,10 @@
             // Clear the opposite field's selection
             if (isList) {
                 individualEmailSelect.value = ''; // Clear individual email selection
-                $(individualEmailSelect).trigger('change'); // Trigger Select2 update
+                $(individualEmailSelect).trigger('change'); 
             } else {
                 targetListSelect.value = ''; // Clear target list selection
-                $(targetListSelect).trigger('change'); // Trigger Select2 update
+                $(targetListSelect).trigger('change'); 
             }
         });
 
@@ -191,46 +190,45 @@
             
             updateTemplatePreview();
         });
+    });
+    document.getElementById('newTestForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-        document.getElementById('newTestForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        const formData = new FormData(event.target);
 
-            const formData = new FormData(event.target);
+        const testId = formData.get('testId');
+        const targetType = formData.get('targetType');
 
-            const testId = formData.get('testId'); // Retrieve test ID from hidden field
-            const targetType = formData.get('targetType');
-
-            if (targetType === 'list') {
-                const listId = targetListSelect.value;
-                if (!listId) {
-                    alert('Please select a target list.');
-                    return;
-                }
-                formData.set('list_id', listId);
+        if (targetType === 'list') {
+            const listId = targetListSelect.value;
+            if (!listId) {
+                alert('Please select a target list.');
+                return;
             }
+            formData.set('list_id', listId);
+        }
 
-            const payload = Object.fromEntries(formData.entries());
-            console.log('Payload:', payload);
+        const payload = Object.fromEntries(formData.entries());
+        console.log('Payload:', payload);
+        console.log('test');
+        try {
+            const response = await fetch(`/tests/update/${testId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
 
-            try {
-                const response = await fetch(`/tests/update/${testId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-
-                if (response.ok) {
-                    alert('Test updated successfully!');
-                    window.location.href = `/campaigns/manage/${payload.camp_id}`;
-                } else {
-                    console.log(response);
-                    alert('Failed to update test.');
-                }
-            } catch (error) {
-                console.error('Error updating test:', error);
-                alert('An error occurred while updating the test.');
+            if (response.ok) {
+                alert('Test updated successfully!');
+                window.location.href = `/campaigns/manage/${payload.camp_id}`;
+            } else {
+                console.log(response);
+                alert('Failed to update test.');
             }
-        });
+        } catch (error) {
+            console.error('Error updating test:', error);
+            alert('An error occurred while updating the test.');
+        }
     });
 });
 
