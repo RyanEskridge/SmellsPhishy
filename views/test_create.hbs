@@ -52,10 +52,11 @@
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
                 <select class="form-control select2" id="individualEmail" name="individualEmail">
-                <select class="form-control select2" id="individualEmail" name="individualEmail">
-                    <option value="" selected disabled>SELECT</option>
+                    <option value="" disabled {{#unless test.individualEmail}}selected{{/unless}}>SELECT</option>
                     {{#each targets}}
-                    <option value="{{id}}">{{EmailAddress}}</option>
+                        <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
+                            {{EmailAddress}}
+                        </option>
                     {{/each}}
                 </select>
             </div>

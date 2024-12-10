@@ -32,6 +32,8 @@ Tests.belongsTo(EmailTemplate, { foreignKey: 'template_id' });
 EmailTemplate.hasMany(Tests, { foreignKey: 'template_id' });
 
 
+
+
 // Export all models
 module.exports = {
     Campaigns,

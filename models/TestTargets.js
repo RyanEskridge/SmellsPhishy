@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
 const sequelize = require('../config/database');
 
-const TargetTests = sequelize.define('TargetTests', {
+const TestTargets = sequelize.define('TestTargets', {
     id: {
         type: DataTypes.INTEGER, // Change to INTEGER to match database schema
         autoIncrement: true,
@@ -31,4 +31,4 @@ const TargetTests = sequelize.define('TargetTests', {
     }
 }, { timestamps: false });
 
-module.exports = TargetTests;
+module.exports = TestTargets;

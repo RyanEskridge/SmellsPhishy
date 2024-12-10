@@ -1,8 +1,8 @@
 const express = require('express');
-// const clerk = require
 const router = express.Router();
-const { EmailTemplate, Tests, Campaigns, TestTargets } = require('../models');
+const { Tests, Campaigns, TestTargets} = require('../models');
 const { clerkClient } = require('@clerk/express');
+const sequelize = require('../config/database');
 
 router.get('/', async (req, res) => {
   try {
@@ -47,8 +47,8 @@ router.put('/:id', async (req, res) => {
 
     // Merge updated fields with existing fields
     const updatedData = {
-      ...campaign.get(), // Existing data
-      ...req.body,       // Updated data from request
+      ...campaign.get(), 
+      ...req.body,       
     };
 
     // Update the campaign
@@ -74,7 +74,7 @@ router.post('/delete/:id', async (req, res) => {
       return res.status(404).send('Campaign not found');
     }
 
-    // Delete TargetTests
+    // Delete TestTargets
     const testIds = tests.map(test => test.id);
     await TestTargets.destroy({
         where: { testId: testIds },
@@ -100,17 +100,28 @@ router.get('/manage/:id', async (req, res) => {
   try {
     const campaign = await Campaigns.findByPk(campaignId);
     const statusText = campaign.status ? 'Active' : 'Inactive';
-    
+
     const tests = await Tests.findAll({
       raw: true,
       where: {
-        camp_id: campaignId
+        camp_id: campaignId,
+      },
+      attributes: {
+        include: [
+          [
+            sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM TestTargets
+              WHERE TestTargets.testId = Tests.id
+            )`),
+            'targetCount',
+          ],
+        ],
       },
     });
 
-    user = await clerkClient.users.getUser(campaign.owner)
+    const user = await clerkClient.users.getUser(campaign.owner);
 
-    //console.log(statusText)
     if (!campaign) {
       return res.status(404).send('Campaign not found.');
     }
@@ -125,9 +136,10 @@ router.get('/manage/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);
-    res.status(500).send('Server Error')
+    res.status(500).send('Server Error');
   }
 });
+
 
 router.post('/toggle-status/:id', async (req, res) => {
   const campaignId = req.params.id;

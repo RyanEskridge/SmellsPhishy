@@ -72,6 +72,7 @@
       <th scope="col">ID</th>
       <th scope="col">Owner</th>
       <th scope="col">Status</th>
+      <th scope="col">Targets</th>
       <th scope="col">Delete</th>
       <th scope="col">Edit</th>
     </tr>
@@ -93,6 +94,7 @@
             </div>
             {{/if}}
         </td>
+        <td>{{targetCount}}</td>
         <td>
             <button data-test-id="{{id}}" class="delete-test btn brand-btn"><i class="bi bi-trash3"></i></button>
         </td>

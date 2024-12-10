@@ -42,7 +42,7 @@
             <div class="mb-3" id="targetListArea">
                 <label for="targetList" class="form-label">Target List</label>
                 <select class="form-control select2" id="targetList" name="targetList">
-                    <option value="" disabled>SELECT</option>
+                    <option value="">SELECT</option>
                     {{#each targetLists}}
                         <option value="{{this.id}}" {{#if (eq ../test.list_id this.id)}}selected{{/if}}>
                             {{this.ListName}}
@@ -108,28 +108,62 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Initialize Select2
-        $('.select2').select2({
-            width: '100%',
-            placeholder: 'Search or select an option',
-            allowClear: true
-        });
+    // Initialize Select2
+    $('.select2').select2({
+        width: '100%',
+        placeholder: 'Search or select an option',
+        allowClear: true
+    });
 
-        const targetListArea = document.getElementById('targetListArea');
-        const individualEmailArea = document.getElementById('individualEmailArea');
-        const customContentArea = document.getElementById('customContentArea');
-        const emailTemplate = document.getElementById('emailTemplate');
-        const templatePreview = document.getElementById('templatePreview');
-        const templateSubject = document.getElementById('templateSubject');
-        const templateBody = document.getElementById('templateBody');
+    const targetListArea = document.getElementById('targetListArea');
+    const targetListSelect = document.getElementById('targetList');
+    const individualEmailArea = document.getElementById('individualEmailArea');
+    const individualEmailSelect = document.getElementById('individualEmail');
 
-        // Handle target type toggle
-        document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
-            elem.addEventListener('change', () => {
-                const isList = elem.value === 'list';
-                targetListArea.style.display = isList ? 'block' : 'none';
-                individualEmailArea.style.display = isList ? 'none' : 'block';
-            });
+    // Preselect Initial State
+    const targetType = document.querySelector('input[name="targetType"]:checked')?.value;
+    const selectedTargetList = targetListSelect.value;
+    const selectedIndividualEmail = individualEmailSelect.value;
+
+    //console.log('Initial Target Type:', targetType);
+    //console.log('Selected Target List:', selectedTargetList);
+    //console.log('Selected Individual Email:', selectedIndividualEmail);
+
+    if (targetType === 'list' && selectedTargetList) {
+        // Show target list area, hide individual email area
+        targetListArea.style.display = 'block';
+        individualEmailArea.style.display = 'none';
+        $(targetListSelect).val(selectedTargetList).trigger('change');
+    } else if (targetType === 'individual' && selectedIndividualEmail) {
+        // Show individual email area, hide target list area
+        targetListArea.style.display = 'none';
+        individualEmailArea.style.display = 'block';
+        $(individualEmailSelect).val(selectedIndividualEmail).trigger('change');
+    } else {
+        // Default state: hide both areas
+        targetListArea.style.display = 'none';
+        individualEmailArea.style.display = 'none';
+    }
+
+    // Handle target type toggle
+    document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
+        elem.addEventListener('change', () => {
+            const isList = elem.value === 'list';
+
+            console.log('Target Type Changed to:', elem.value);
+
+            // Toggle visibility
+            targetListArea.style.display = isList ? 'block' : 'none';
+            individualEmailArea.style.display = isList ? 'none' : 'block';
+
+            // Clear the opposite field's selection
+            if (isList) {
+                individualEmailSelect.value = ''; // Clear individual email selection
+                $(individualEmailSelect).trigger('change'); // Trigger Select2 update
+            } else {
+                targetListSelect.value = ''; // Clear target list selection
+                $(targetListSelect).trigger('change'); // Trigger Select2 update
+            }
         });
 
         // Update template preview visibility
@@ -158,31 +192,38 @@
             updateTemplatePreview();
         });
 
-        // Form submission handler
         document.getElementById('newTestForm').addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const formData = new FormData(event.target);
-            const testId = formData.get('testId');
 
-            if (!testId) {
-                alert('Test ID is missing!');
-                return;
+            const testId = formData.get('testId'); // Retrieve test ID from hidden field
+            const targetType = formData.get('targetType');
+
+            if (targetType === 'list') {
+                const listId = targetListSelect.value;
+                if (!listId) {
+                    alert('Please select a target list.');
+                    return;
+                }
+                formData.set('list_id', listId);
             }
 
             const payload = Object.fromEntries(formData.entries());
+            console.log('Payload:', payload);
 
             try {
                 const response = await fetch(`/tests/update/${testId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
                 });
 
                 if (response.ok) {
                     alert('Test updated successfully!');
                     window.location.href = `/campaigns/manage/${payload.camp_id}`;
                 } else {
+                    console.log(response);
                     alert('Failed to update test.');
                 }
             } catch (error) {
@@ -191,6 +232,8 @@
             }
         });
     });
+});
+
 </script>
 
 </body>

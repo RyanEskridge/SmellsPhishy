@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns } = require('../models');
-const { clerkClient } = require('@clerk/express');
+//const { clerkClient } = require('@clerk/express');
+const sequelize = require('../config/database');
 
 router.get('/create', async (req, res) => {
     const campId = req.query.camp_id;
@@ -40,7 +41,6 @@ router.post('/create', async (req, res) => {
             title,
             template_id: template_id || null,
             list_id: targetList,
-            list_id: targetList,
             scheduled_time: scheduledTime,
             owner: req.auth.userId,
             status: false,
@@ -66,17 +66,16 @@ router.post('/create', async (req, res) => {
           await TestTargets.bulkCreate(testTargets);
         } 
 
+
         if (individualEmail) {
           const target = await Targets.findOne({ 
             where: { id: individualEmail }, 
           });
-
           const testTargets = {
             targetId: target.id,
             testId: test.id,
           }
-
-          await TestTargets.bulkCreate(testTargets);
+          await TestTargets.create(testTargets);
         }
       
         // Handle custom content if provided
@@ -139,26 +138,72 @@ router.put('/update/status/:id', async (req, res) => {
     const testId = req.params.id;
 
     try {
-      const test = await Tests.findByPk(testId);
+        // Fetch the test details, including the target count
+        const test = await Tests.findByPk(testId, {
+            attributes: {
+                include: [
+                    [
+                        sequelize.literal(`(
+                          SELECT COUNT(*)
+                          FROM TestTargets
+                          WHERE TestTargets.testId = Tests.id
+                        )`),
+                        'targetCount',
+                    ],
+                ],
+            },
+        });
 
-      if (!test) {
-        return res.status(404).send('Test not found');
-      }
+        if (!test) {
+            return res.status(404).send('Test not found');
+        }
 
-      const targetLists = await Lists.findAll();
-      const emailTemplates = await EmailTemplate.findAll();
-      const allTargets = await Targets.findAll();
-      res.render('test_edit', {
-        title: 'Edit Test',
-        description: 'Update the test details below.',
-        test: test.get({ plain: true }),
-        targets: allTargets.map((target) => target.get({ plain: true })),
-        targetLists: targetLists.map((list) => list.get({ plain: true })),
-        emailTemplates: emailTemplates.map((template) => template.get({ plain: true })),
-      });
+        //console.log('Test:', test.get({ plain: true }));
+
+        const targetCount = test.get('targetCount');
+        let individualEmail = null;
+
+        //console.log('Target Count:', targetCount);
+
+        if (targetCount === 1) {
+            // Fetch the single associated target
+            const singleTarget = await Targets.findOne({
+                include: {
+                    model: Tests,
+                    through: { attributes: [] }, // Exclude join table attributes
+                    where: { id: testId },
+                },
+            });
+
+            //console.log('Single Target:', singleTarget?.get({ plain: true }));
+
+            if (singleTarget) {
+                individualEmail = singleTarget.id;
+            }
+        }
+
+        //console.log('Individual Email:', individualEmail);
+
+        // Fetch related data
+        const targetLists = await Lists.findAll();
+        const emailTemplates = await EmailTemplate.findAll();
+        const allTargets = await Targets.findAll();
+
+        // Render the view
+        res.render('test_edit', {
+            title: 'Edit Test',
+            description: 'Update the test details below.',
+            test: {
+                ...test.get({ plain: true }),
+                individualEmail, // Pass individualEmail to the view
+            },
+            targets: allTargets.map((target) => target.get({ plain: true })),
+            targetLists: targetLists.map((list) => list.get({ plain: true })),
+            emailTemplates: emailTemplates.map((template) => template.get({ plain: true })),
+        });
     } catch (error) {
-      console.error('Error fetching test:', error);
-      res.status(500).send('Server Error');
+        console.error('Error fetching test:', error);
+        res.status(500).send('Server Error');
     }
 });
 
@@ -182,6 +227,8 @@ router.put('/update/:id', async (req, res) => {
 
     // Clear previous test targets
     await TestTargets.destroy({ where: { testId } });
+    //console.log('Target List: ', targetList)
+    //console.log('Individual: ', individualEmail)
 
     // Handle Target List
     if (targetList) {
