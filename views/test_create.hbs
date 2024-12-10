@@ -64,18 +64,12 @@
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2 select2" id="emailTemplate" name="template_id" required>
-                    <option value="custom" selected>Custom Content</option>
                     {{#each emailTemplates}}
                     <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
                         {{this.name}}
                     </option>
                     {{/each}}
                 </select>
-            </div>
-
-            <div class="mb-3" id="customContentArea">
-                <label for="customContent" class="form-label">Custom Content</label>
-                <textarea class="form-control" id="customContent" name="customContent" rows="5"></textarea>
             </div>
 
             <div class="mt-4" id="templatePreview" style="display: none;">
@@ -126,15 +120,9 @@
             const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
             const templateId = selectedOption.value;
 
-           if (templateId === "custom") { // Explicitly handle "Custom Content"
-                customContentArea.style.display = 'block';
-                templatePreview.style.display = 'none';
-            } else {
-                customContentArea.style.display = 'none';
-                templatePreview.style.display = 'block';
-                templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
-                templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
-            }
+            templatePreview.style.display = 'block';
+            templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+            templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
         };
 
 

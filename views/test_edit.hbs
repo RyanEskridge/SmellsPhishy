@@ -68,7 +68,6 @@
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2" id="emailTemplate" name="template_id" required>
-                   <option value="custom" data-subject="" data-body="">Custom Content</option>
                     {{#each emailTemplates}}
                         <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}" 
                             {{#if (eq ../test.template_id this.id)}}selected{{/if}}>
@@ -78,10 +77,6 @@
                 </select>
             </div>
 
-            <div class="mb-3" id="customContentArea">
-                <label for="customContent" class="form-label">Custom Content</label>
-                <textarea class="form-control" id="customContent" name="customContent" rows="5"></textarea>
-            </div>
 
             <div class="mt-4" id="templatePreview" style="display: none;">
                 <h4>Template Preview</h4>
@@ -163,15 +158,9 @@
         const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
         const templateId = selectedOption.value;
 
-        if (templateId === "custom") {
-            document.getElementById('customContentArea').style.display = 'block';
-            document.getElementById('templatePreview').style.display = 'none';
-        } else {
-            document.getElementById('customContentArea').style.display = 'none';
-            document.getElementById('templatePreview').style.display = 'block';
-            document.getElementById('templateSubject').textContent = selectedOption.getAttribute('data-subject') || 'N/A';
-            document.getElementById('templateBody').textContent = selectedOption.getAttribute('data-body') || 'N/A';
-        }
+        document.getElementById('templatePreview').style.display = 'block';
+        document.getElementById('templateSubject').textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+        document.getElementById('templateBody').textContent = selectedOption.getAttribute('data-body') || 'N/A';
     };
 
     updateTemplatePreview();

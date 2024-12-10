@@ -34,7 +34,7 @@ router.get('/create', async (req, res) => {
 });
 
 router.post('/create', async (req, res) => {
-    const { camp_id, title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
+    const { camp_id, title, template_id, targetList, individualEmail, scheduledTime } = req.body;
     try {
         const test = await Tests.create({
             camp_id,
@@ -78,12 +78,6 @@ router.post('/create', async (req, res) => {
           await TestTargets.create(testTargets);
         }
       
-        // Handle custom content if provided
-        if (!template_id && customContent) {
-            // TODO
-            console.log('Custom Content:', customContent);
-        }
-
         res.status(200).json({ message: 'Test created successfully', test });
     } catch (error) {
         console.error('Error creating test:', error);
@@ -209,7 +203,7 @@ router.put('/update/status/:id', async (req, res) => {
 
 router.put('/update/:id', async (req, res) => {
   const testId = req.params.id;
-  const { title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
+  const { title, template_id, targetList, individualEmail, scheduledTime } = req.body;
   try {
     // Find the test by ID
     const test = await Tests.findByPk(testId);
@@ -261,12 +255,6 @@ router.put('/update/:id', async (req, res) => {
         targetId: target.id,
         testId: test.id
       });
-    }
-
-    // Handle Custom Content
-    if (!template_id && customContent) {
-      // TODO: Update db instead of logging.
-      console.log('Custom Content:', customContent);
     }
 
     res.status(200).json({ message: 'Test updated successfully', test });
