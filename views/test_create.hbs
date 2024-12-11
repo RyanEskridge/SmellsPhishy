@@ -86,11 +86,6 @@
                 </select>
             </div>
 
-            <div class="mb-3" id="customContentArea">
-                <label for="customContent" class="form-label">Custom Content</label>
-                <textarea class="form-control" id="customContent" name="customContent" rows="5"></textarea>
-            </div>
-
             <div class="mt-4" id="templatePreview" style="display: none;">
                 <h4>Template Preview</h4>
                 <p><strong>Subject:</strong> <span id="templateSubject"></span></p>
@@ -124,13 +119,24 @@
         const templatePreview = document.getElementById('templatePreview');
         const templateSubject = document.getElementById('templateSubject');
         const templateBody = document.getElementById('templateBody');
+        const targetListSelect = document.getElementById('targetList');
+        const individualEmailSelect = document.getElementById('individualEmail');
+        const targetTypeRadios = document.querySelectorAll('input[name="targetType"]');
 
         // Handle target type toggle
-        document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
+        targetTypeRadios.forEach((elem) => {
             elem.addEventListener('change', () => {
                 const isList = elem.value === 'list';
                 targetListArea.style.display = isList ? 'block' : 'none';
                 individualEmailArea.style.display = isList ? 'none' : 'block';
+
+                if (isList) {
+                    individualEmailSelect.value = ''; // Clear individual email selection
+                    $(individualEmailSelect).trigger('change');
+                } else {
+                    targetListSelect.value = ''; // Clear target list selection
+                    $(targetListSelect).trigger('change');
+                }
             });
         });
 
@@ -139,15 +145,9 @@
             const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
             const templateId = selectedOption.value;
 
-           if (templateId === "custom") { // Explicitly handle "Custom Content"
-                customContentArea.style.display = 'block';
-                templatePreview.style.display = 'none';
-            } else {
-                customContentArea.style.display = 'none';
-                templatePreview.style.display = 'block';
-                templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
-                templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
-            }
+            templatePreview.style.display = 'block';
+            templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+            templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
         };
 
 

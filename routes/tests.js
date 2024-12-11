@@ -216,7 +216,7 @@ router.put('/update/status/:id', async (req, res) => {
 
 router.put('/update/:id', async (req, res) => {
   const testId = req.params.id;
-  const { title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
+  const { title, template_id, targetList, individualEmail, scheduledTime } = req.body;
   try {
     // Find the test by ID
     const test = await Tests.findByPk(testId);
@@ -268,12 +268,6 @@ router.put('/update/:id', async (req, res) => {
         targetId: target.id,
         testId: test.id
       });
-    }
-
-    // Handle Custom Content
-    if (!template_id && customContent) {
-      // TODO: Update db instead of logging.
-      console.log('Custom Content:', customContent);
     }
 
     res.status(200).json({ message: 'Test updated successfully', test });

@@ -117,7 +117,7 @@
 <hr>
 {{#if results.length}}
 {{#each results}}
-  <h5 style="margin-top:30px;">{{testTitle}}</h5>
+  {{#if this.targets.length}}<h5 style="margin-top:30px;">{{testTitle}}</h5>{{/if}}
   {{#if this.targets.length}}
   <table class="table table-striped">
   <thead>
@@ -139,42 +139,11 @@
     {{/each}}
     </tbody>
   </table>
-  {{else}}
-    <p>No clicks yet for this test.</p>
   {{/if}}
 {{/each}}
 {{else}}
   <p>No clicks.</p>
 {{/if}}
-
-
-
-{{!-- {{#each results}}
-  <h3>{{testTitle}}</h3>
-  {{#if targets.length}}
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Department</th>
-      <th scope="col">Supervisor</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each targets}}
-    <tr>
-        <td>{{ name }}</td>
-        <td>{{ department }}</td>
-        <td>{{ supervisor }}</td>
-        </tr>
-    {{/each}}
-  </tbody>
-</table>
-
-  {{else}}
-    <p>No targets found for this test.</p>
-  {{/if}}
-{{/each}} --}}
 
 
 <script>
