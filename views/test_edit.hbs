@@ -19,7 +19,7 @@
         <h1>{{title}}</h1>
         <p>{{description}}</p>
 
-        <form id="newTestForm">
+        <form id="newTestForm" class="col-8 px-0">
             <!-- Campaign ID as a hidden field -->
             <input type="hidden" name="testId" value="{{test.id}}">
             <input type="hidden" name="camp_id" value="{{test.camp_id}}">
@@ -68,7 +68,7 @@
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2" id="emailTemplate" name="template_id" required>
-                   <option value="custom" data-subject="" data-body="">Custom Content</option>
+                   {{!-- <option value="custom" data-subject="" data-body="">Custom Content</option> --}}
                     {{#each emailTemplates}}
                         <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}" 
                             {{#if (eq ../test.template_id this.id)}}selected{{/if}}>

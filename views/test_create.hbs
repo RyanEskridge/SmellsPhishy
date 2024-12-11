@@ -20,13 +20,23 @@
         <h1>{{title}}</h1>
         <p>{{description}}</p>
 
-        <form id="newTestForm">
+        <form id="newTestForm" class="col-8">
             <!-- Campaign ID as a hidden field -->
             <input type="hidden" name="camp_id" value="{{campId}}">
 
             <div class="mb-3">
                 <label for="title" class="form-label">Test Title</label>
                 <input type="text" id="title" name="title" class="form-control" placeholder="Enter test title" required>
+            </div>
+
+            <div class="mb-3" id="clickOption">
+                <label for="targetList" class="form-label">Click Behavior</label>
+                <select class="form-control" id="option" name="option">
+                    <option value="" selected disabled>Select an option</option>
+                    <option value="0">Default Page</option>
+                    <option value="1">Redirect (Custom link)</option>
+                    <option value="2">404</option>
+                </select>
             </div>
 
             <div class="mb-3">
@@ -41,8 +51,8 @@
 
             <div class="mb-3" id="targetListArea">
                 <label for="targetList" class="form-label">Target List</label>
-                <select class="form-control select2 select2" id="targetList" name="targetList">
-                    <option value="" selected disabled>SELECT</option>
+                <select class="form-control" id="targetList" name="targetList">
+                    <option value="" selected disabled>Select a target list</option>
                     {{#each targetLists}}
                     <option value="{{this.id}}">{{this.ListName}}</option>
                     {{/each}}
@@ -51,8 +61,11 @@
 
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
-                <select class="form-control select2" id="individualEmail" name="individualEmail">
-                    <option value="" disabled {{#unless test.individualEmail}}selected{{/unless}}>SELECT</option>
+                {{!-- <input type="email" class="form-control" id="individualEmail" name="individualEmail"
+                    placeholder="Enter email"> --}}
+                <!-- Replaced text input with SELECT to guarantee target exists and simplify TestTarget -->
+                <select class="form-control" id="individualEmail" name="individualEmail">
+                    <option value="" selected disabled>Select a single target</option>
                     {{#each targets}}
                         <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
                             {{EmailAddress}}
@@ -64,7 +77,7 @@
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
                 <select class="form-control select2 select2" id="emailTemplate" name="template_id" required>
-                    <option value="custom" selected>Custom Content</option>
+                    {{!-- <option value="custom" selected>Custom Content</option> --}}
                     {{#each emailTemplates}}
                     <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
                         {{this.name}}

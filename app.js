@@ -10,12 +10,6 @@ const sequelize = require('./config/database');
 
 const { EmailTemplate, Targets, Lists, Tests, Campaigns } = require('./models')
 
-/*
-const EmailTemplate = require('./models/EmailTemplate');
-const Targets = require('./models/Targets');
-const Lists = require('./models/Lists');
-*/
-
 const { createLink } = require('./helpers/linkHelper');
 
 const app = express();

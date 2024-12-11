@@ -34,7 +34,9 @@ router.get('/create', async (req, res) => {
 });
 
 router.post('/create', async (req, res) => {
-    const { camp_id, title, template_id, customContent, targetList, individualEmail, scheduledTime } = req.body;
+    const { camp_id, title, template_id, customContent, targetList, individualEmail, scheduledTime, option } = req.body;
+    console.log( scheduledTime);
+    const opt = option || '0';
     try {
         const test = await Tests.create({
             camp_id,
@@ -43,10 +45,11 @@ router.post('/create', async (req, res) => {
             list_id: targetList,
             scheduled_time: scheduledTime,
             owner: req.auth.userId,
+            option: opt,
             status: false,
         });
 
-        if (targetList) {
+        if (targetList !== undefined) {
           const list = await Lists.findOne({ 
             where: { id: targetList }, 
             attributes: ['ListTargets']
@@ -66,16 +69,18 @@ router.post('/create', async (req, res) => {
           await TestTargets.bulkCreate(testTargets);
         } 
 
-
-        if (individualEmail) {
+        if (individualEmail !== undefined) {
           const target = await Targets.findOne({ 
             where: { id: individualEmail }, 
           });
-          const testTargets = {
+
+          const testTarget = {
             targetId: target.id,
             testId: test.id,
           }
-          await TestTargets.create(testTargets);
+
+          await TestTargets.create(testTarget);
+          console.log(individualEmail);
         }
       
         // Handle custom content if provided
@@ -95,6 +100,8 @@ router.post('/create', async (req, res) => {
 router.put('/update/status/:id', async (req, res) => {
     const testId = req.params.id; 
     const { status } = req.body;
+    // console.log(`ID: ${testId}`)
+    // console.log(`status: ${status}`)
     try {
       const test = await Tests.findByPk(testId);
   

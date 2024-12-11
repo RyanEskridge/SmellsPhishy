@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Tests, Campaigns, TestTargets} = require('../models');
+const { Tests, Campaigns, TestTargets, Targets } = require('../models');
 const { clerkClient } = require('@clerk/express');
 const sequelize = require('../config/database');
 
@@ -120,6 +120,33 @@ router.get('/manage/:id', async (req, res) => {
       },
     });
 
+    const results = [];
+    for (const test of tests) {
+          // Get all target data associated with the test
+          const targetAssociations = await TestTargets.findAll({
+              where: { testId: test.id, clicked: true },
+              raw: true,
+          });
+
+          const targetIds = targetAssociations.map((association) => association.targetId);
+          const targets = await Targets.findAll({
+              where: { id: targetIds, },
+              raw: true,
+          });
+          
+        results.push({
+          testTitle: test.title,
+          targets: targets.map(target => ({
+            name: `${target.FirstName} ${target.LastName}`,
+            department: target.Department,
+            supervisor: target.Supervisor,
+            email: target.EmailAddress,
+          }))
+        });
+      }
+
+
+
     const user = await clerkClient.users.getUser(campaign.owner);
 
     if (!campaign) {
@@ -133,6 +160,7 @@ router.get('/manage/:id', async (req, res) => {
       user,
       statusText,
       tests: tests || [],
+      results: results, // Change here to pass the modified results
     });
   } catch (error) {
     console.error('Error fetching campaign:', error);

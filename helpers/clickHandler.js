@@ -1,56 +1,66 @@
-const handleClick = (req, res) => {
-  // Get clickId
+const { Tests, TestTargets, GlobalSettings } = require('../models');
 
-  const { clickId } = req.params;
-  const isValid = /^[A-Za-z0-9]{6}$/.test(clickId);
+const handleClick = async (req, res) => {
+  const { option, test, target } = req.params;
 
-  // Validate clickId
+  const options = []
 
-  if (req.path === '/click' || !isValid) {
-    return res.status(404).send('Not Found');
+  const foundTarget = await TestTargets.findOne({
+    where: {
+      testId: test,
+      targetId: target,
+    }
+  });
+  // console.log(foundTarget);
+  if(!foundTarget) {
+    res.status(500).json({ message: 'Failed to load.' });
   }
 
-  const simulatedUsers = [
-    {
-      id: 'asd24x',
-      behavior: null
-    },
-    {
-      id: 'asd24y',
-      behavior: 'redirect',
-      redirectUrl: 'https://www.youtube.com/watch?v=o0btqyGWIQw'
-    },
-    {
-      id: 'asd24z',
-      behavior: 'error',
-      errorCode: 404,
-      errorMsg: 'Not found'
+  if (!foundTarget.clicked) {
+    foundTarget.clicked = true;
+    await foundTarget.save();
+  }
+  console.log(foundTarget.id)
+  let plainSettings;
+  const defaultSettings = {
+    id: 1,
+    CompanyName: 'Mediocre Solutions',
+    ApiKey: '6a53edf24a8d7698710adc470115b90',
+    CustomLink: 'https://www.youtube.com/watch?v=o0btqyGWIQw'
+  };
+  
+  try {
+    const settings = await GlobalSettings.findByPk(1);
+    if (!settings) { 
+      plainSettings = defaultSettings; 
+    } else {
+      plainSettings = settings.get({ plain: true });
     }
-  ];
+  } catch (error) {
+    console.error('Error fetching GlobalSettings:', error);
+    plainSettings = defaultSettings;
+  }
 
-  const match = simulatedUsers.find((user) => user.id === clickId);
-  const behavior = match.behavior ? match.behavior : null;
-  const errCode = match.errorCode ? match.errorCode : 404;
-  const errMsg = match.errorMsg ? match.errorMsg : 'Not Found';
-  const redirectUrl = match.redirectUrl ? match.redirectUrl : null;
-
-  // Click handling switch
-
-  switch (behavior) {
-    case 'redirect':
-      res.redirect(redirectUrl);
-      break;
-    case 'error':
-      res.status(errCode).send(errMsg);
-      break;
-    default:
+  switch (option) {
+    case "0":
       res.render('click_default', {
         layout: 'click',
         title: 'Click',
         description: 'You did a bad thing.',
-        path: `${clickId}`
+        path: `${foundTarget.targetId}`
       });
+      break;
+    case "1":
+      res.redirect(plainSettings.CustomLink);
+      break;
+    case "2":
+      res.status(errCode).send(errMsg);
+      break;
+    default:
+      res.status(500).json({ message: 'Failed to load.' });
+      break;
   }
+
 };
 
 module.exports = {

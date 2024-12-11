@@ -1,27 +1,31 @@
-const { Op } = require('sequelize');
 const express = require('express');
 const router = express.Router();
-const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns } = require('../models')
-const mailHandler = require('../helpers/mailHandler');
+const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns, GlobalSettings } = require('../models')
+const { sendMail, massMailer } = require('../helpers/mailHandler');
 const { clerkClient } = require('@clerk/express');
 
+console.log();
+
 router.post('/send-email', (req, res) => {
-  mailHandler.sendMail(req, res);
+  sendMail(req, res);
 });
 
 router.get('/mail', async (req, res) => {
 try {
+    const settings = await GlobalSettings.findByPk(1);
+    const plainSettings = settings.get({ plain: true });
+    
     const currentTime = Date.now();
     const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-    const tests = await Tests.findAll({ raw: true });
+    const tests = await Tests.findAll({ raw: true, where: {status: true} });
     const results = [];
 
     for (const test of tests) {
         const scheduledTime = new Date(test.scheduled_time).getTime();
-
+        
         // Check if the test is within the last 24 hours
-        if (currentTime - scheduledTime <= oneDay) {
+        if (true || currentTime - scheduledTime <= oneDay) {
             // Get the full EmailTemplate for this test
             const emailTemplate = await EmailTemplate.findOne({
                 where: { id: test.template_id },
@@ -41,37 +45,42 @@ try {
 
             results.push({
                 template: emailTemplate, 
-                targets: targets,       
+                targets: targets,    
+                testId: test.id, 
+                option: test.option  
             });
         }
     }
-
+    
     results.forEach((result) => {
-        
         const templateSubject = result.template.subject;
         const templateBody = result.template.body;
         const from = "admin@mediocresolutions.org"
-        
+
         result.targets.forEach((target) => {   
+            const local = "http://localhost:8080";
+            const remote = "https://mediocresolutions.com";
+            const compositeUrl = `${local}/click/${result.option}/${result.testId}/${target.id}`;
+            console.log(compositeUrl);
             const data = {
                 "target.name": `${target.FirstName} ${target.LastName}`,
-                company: "Mediocre Solutions",
-                link: "https://example.com/reset-password"
+                "company.name": plainSettings.CompanyName,
+                company: plainSettings.CompanyName,
+                link: compositeUrl,
             };
-
+            // console.log(target.EmailAddress)
             const updatedBody = templateBody.replace(/{([^}]+)}/g, (_, key) => data[key] || `{${key}}`);
             
-            console.log ("\n-------------------------------------------------------------------\n");
-            console.log(`TO: ${target.EmailAddress}`);
-            console.log(`FROM: ${from}`);
-            console.log(`SUBJECT: ${templateSubject}`);
-            console.log("BODY: \n");
-            console.log(updatedBody);
-            console.log ("\n-------------------------------------------------------------------\n");
+            massMailer(from, target.EmailAddress, templateSubject, updatedBody, updatedBody);
 
-            // console.log(`Job Title: ${target.JobTitle}`);
-            // console.log(`Supervisor: ${target.Supervisor}`);
-            // console.log(`Department: ${target.Department}`);
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            delay(3000) 
+            .then(() => {
+                console.log("Waiting 3 seconds...");
+            });
         });
     });
 

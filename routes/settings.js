@@ -5,25 +5,27 @@ const { clerkClient } = require('@clerk/express');
 
 
 router.get('/', async (req, res) => {
-    let plainSettings;
-    const defaultSettings = {
-      id: 1,
-      CompanyName: 'Mediocre Solutions',
-      ApiKey: '6a53edf24a8d7698710adc470115b90',
-      CustomLink: 'https://example.com'
-    };
-    
-    try {
-      const settings = await GlobalSettings.findByPk(1);
-      if (!settings) { 
-        plainSettings = defaultSettings; 
-      } else {
-        plainSettings = settings.get({ plain: true });
-      }
-    } catch (error) {
-      console.error('Error fetching GlobalSettings:', error);
-      plainSettings = defaultSettings;
+  let plainSettings;
+  const defaultSettings = {
+    id: 1,
+    CompanyName: 'Mediocre Solutions',
+    ApiKey: '6a53edf24a8d7698710adc470115b90',
+    CustomLink: 'https://www.youtube.com/watch?v&#x3D;o0btqyGWIQw'
+  };
+  
+  try {
+    const settings = await GlobalSettings.findByPk(1);
+    if (!settings) { 
+      plainSettings = defaultSettings; 
+    } else {
+      plainSettings = settings.get({ plain: true });
     }
+  } catch (error) {
+    console.error('Error fetching GlobalSettings:', error);
+    plainSettings = defaultSettings;
+  }
+  
+
     res.render('settings', {
       title: 'Settings',
       description: 'Adjust your settings here.',
