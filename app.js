@@ -8,7 +8,7 @@ const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
 
-const { EmailTemplate, Targets, Lists, Tests, Campaigns } = require('./models')
+const { EmailTemplate, Targets, Lists, Tests, Campaigns, TestTargets } = require('./models')
 
 const { createLink } = require('./helpers/linkHelper');
 
@@ -90,12 +90,15 @@ app.use('/settings', settingsRouter);
 
 app.get('/', async (req, res) => {
   try {
-    const [templateCount, targetCount, listCount, campaignCount, testCount] = await Promise.all([
+    const [templateCount, targetCount, listCount, campaignCount, campaignActiveCount, testCount, testActiveCount, clickCount] = await Promise.all([
       EmailTemplate.count(),
       Targets.count(),
       Lists.count(),
       Campaigns.count(),
-      Tests.count()
+      Campaigns.count({ where: { status: true } }),
+      Tests.count(),
+      Tests.count({ where: { status: true } }),
+      TestTargets.count({ where: { clicked: true}})
     ]);
 
     res.render('dashboard', {
@@ -103,7 +106,10 @@ app.get('/', async (req, res) => {
       targetCount,
       listCount,
       testCount,
+      testActiveCount,
       campaignCount,
+      campaignActiveCount,
+      clickCount,
       title: 'Dashboard',
       description: 'Welcome to the dashboard'
     });
