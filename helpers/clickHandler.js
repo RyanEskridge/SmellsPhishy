@@ -54,7 +54,7 @@ const handleClick = async (req, res) => {
       res.redirect(plainSettings.CustomLink);
       break;
     case "2":
-      res.status(errCode).send(errMsg);
+      res.status(404).send('Not Found');
       break;
     default:
       res.status(500).json({ message: 'Failed to load.' });
