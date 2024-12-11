@@ -51,7 +51,7 @@
 
             <div class="mb-3" id="targetListArea">
                 <label for="targetList" class="form-label">Target List</label>
-                <select class="form-control" id="targetList" name="targetList">
+                <select class="form-control select2" id="targetList" name="targetList">
                     <option value="" selected disabled>Select a target list</option>
                     {{#each targetLists}}
                     <option value="{{this.id}}">{{this.ListName}}</option>
@@ -64,7 +64,7 @@
                 {{!-- <input type="email" class="form-control" id="individualEmail" name="individualEmail"
                     placeholder="Enter email"> --}}
                 <!-- Replaced text input with SELECT to guarantee target exists and simplify TestTarget -->
-                <select class="form-control" id="individualEmail" name="individualEmail">
+                <select class="form-control select2" id="individualEmail" name="individualEmail">
                     <option value="" selected disabled>Select a single target</option>
                     {{#each targets}}
                         <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
@@ -76,7 +76,7 @@
 
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
-                <select class="form-control select2 select2" id="emailTemplate" name="template_id" required>
+                <select class="form-control select2" id="emailTemplate" name="template_id" required>
                     {{!-- <option value="custom" selected>Custom Content</option> --}}
                     {{#each emailTemplates}}
                     <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
