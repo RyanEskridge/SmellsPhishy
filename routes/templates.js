@@ -48,9 +48,7 @@ router.get('/new', async (req, res) => {
 
 router.post('/upload', upload.single('templateFile'), async (req, res) => {
   const { name, subject, body } = req.body;
-  //console.log(name);
-  //console.log(subject);
-  //console.log(body);
+  
   if (req.file) {
     const filePath = req.file.path;
 

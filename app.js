@@ -19,7 +19,6 @@ require('dotenv').config();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-
 // Public routes
 app.use(express.static('public'));
 
@@ -61,12 +60,11 @@ app.engine(
     }
   })
 );
+
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(breadcrumbs);
-
-
 
 /* Routers for crucial parts of the app
 that have children or require additional logic. */
@@ -85,8 +83,6 @@ app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
 app.use('/settings', settingsRouter);
-
-
 
 app.get('/', async (req, res) => {
   try {

@@ -76,8 +76,7 @@ const massMailer = async (from, to, subject, text, html) => {
 
       fs.writeFile('./logs/email.log', logEntry, { flag: 'a' }, function (err) {
         logHelper.handleError(err);
-        console.log("Success");
-        // res.status(statusCode).json({ message: 'Email sent successfully' });
+        res.status(statusCode).json({ message: 'Email sent successfully' });
       });
     })
     .catch((err) => {
@@ -86,8 +85,7 @@ const massMailer = async (from, to, subject, text, html) => {
 
       fs.writeFile('./logs/email.log', logEntry, { flag: 'a' }, function (err) {
         logHelper.handleError(err);
-        // res.status(statusCode).json({ error: 'Failed to send email' });
-        console.log("Failed");
+        res.status(statusCode).json({ error: 'Failed to send email' });
       });
     });
 };

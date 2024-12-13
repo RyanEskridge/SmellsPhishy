@@ -2,16 +2,14 @@ const { Tests, TestTargets, GlobalSettings } = require('../models');
 
 const handleClick = async (req, res) => {
   const { option, test, target } = req.params;
-
   const options = []
-
   const foundTarget = await TestTargets.findOne({
     where: {
       testId: test,
       targetId: target,
     }
   });
-  // console.log(foundTarget);
+
   if(!foundTarget) {
     res.status(500).json({ message: 'Failed to load.' });
   }
@@ -20,7 +18,7 @@ const handleClick = async (req, res) => {
     foundTarget.clicked = true;
     await foundTarget.save();
   }
-  console.log(foundTarget.id)
+
   let plainSettings;
   const defaultSettings = {
     id: 1,

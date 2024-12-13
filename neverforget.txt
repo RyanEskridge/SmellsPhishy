@@ -1,7 +1,0 @@
-1. Install NodeJS if it's not installed already.
-2. Git clone the GH project onto your local machine 
-3. Open it in VSCode 
-4. Run 'npm install' from the project directory to install the project's dependencies
-5. Highly recommend running 'npm install -g nodemon' if you want hot refreshes. It makes development a lot easier because you don't have to restart the server every time you make a change. 
-6. If nodemon is installed run 'nodemon app.js' to start the local server. If nodemon isn't installed, run 'node app.js' instead.
-7. Open a browser and navigate to 'localhost:8080' and the site should be running locally

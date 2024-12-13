@@ -61,7 +61,6 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
 router.post('/delete/:id', async (req, res) => {
   const campaignId = req.params.id;
 
@@ -145,8 +144,6 @@ router.get('/manage/:id', async (req, res) => {
         });
       }
 
-
-
     const user = await clerkClient.users.getUser(campaign.owner);
 
     if (!campaign) {
@@ -167,7 +164,6 @@ router.get('/manage/:id', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-
 
 router.post('/toggle-status/:id', async (req, res) => {
   const campaignId = req.params.id;
