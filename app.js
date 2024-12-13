@@ -8,13 +8,7 @@ const breadcrumbs = require('./middleware/breadcrumbs');
 
 const sequelize = require('./config/database');
 
-const { EmailTemplate, Targets, Lists, Tests, Campaigns } = require('./models')
-
-/*
-const EmailTemplate = require('./models/EmailTemplate');
-const Targets = require('./models/Targets');
-const Lists = require('./models/Lists');
-*/
+const { EmailTemplate, Targets, Lists, Tests, Campaigns, TestTargets } = require('./models')
 
 const { createLink } = require('./helpers/linkHelper');
 
@@ -51,20 +45,12 @@ app.get('/signup', (req, res) => {
 app.use(clerkMiddleware());
 app.use(ensureAuthenticated);
 
-app.engine('hbs', exphbs.engine({
-  extname: '.hbs',
-  layoutsDir: path.join(__dirname, 'views/layouts'),
-  partialsDir: path.join(__dirname, 'views/partials')
-}));
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-
-app.use(breadcrumbs);
-
 app.engine(
   'hbs',
   exphbs.engine({
     extname: '.hbs',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials'),
     helpers: {
       increment: function (value) {
         return parseInt(value) + 1;
@@ -75,6 +61,12 @@ app.engine(
     }
   })
 );
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(breadcrumbs);
+
+
 
 /* Routers for crucial parts of the app
 that have children or require additional logic. */
@@ -85,23 +77,28 @@ const templatesRouter = require('./routes/templates');
 const targetsRouter = require('./routes/targets');
 const clickRouter = require('./routes/click');
 const mailRouter = require('./routes/mail');
+const settingsRouter = require('./routes/settings');
 
 app.use('/campaigns', campaignsRouter);
 app.use('/tests', testsRouter);
 app.use('/templates', templatesRouter);
 app.use('/targets', targetsRouter);
 app.use('/click', clickRouter);
+app.use('/settings', settingsRouter);
 
 
 
 app.get('/', async (req, res) => {
   try {
-    const [templateCount, targetCount, listCount, campaignCount, testCount] = await Promise.all([
+    const [templateCount, targetCount, listCount, campaignCount, campaignActiveCount, testCount, testActiveCount, clickCount] = await Promise.all([
       EmailTemplate.count(),
       Targets.count(),
       Lists.count(),
       Campaigns.count(),
-      Tests.count()
+      Campaigns.count({ where: { status: true } }),
+      Tests.count(),
+      Tests.count({ where: { status: true } }),
+      TestTargets.count({ where: { clicked: true}})
     ]);
 
     res.render('dashboard', {
@@ -109,7 +106,10 @@ app.get('/', async (req, res) => {
       targetCount,
       listCount,
       testCount,
+      testActiveCount,
       campaignCount,
+      campaignActiveCount,
+      clickCount,
       title: 'Dashboard',
       description: 'Welcome to the dashboard'
     });
@@ -127,20 +127,13 @@ app.post('/api/create-bitly-link', async (req, res) => {
     return res.status(400).json({ error: 'Invalid URL' });
   }
 
-  try {
+  try {Subject
     const link = await createLink(url);
     res.status(200).json({ link });
   } catch (error) {
     console.error('Error creating Bitly link:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to create Bitly link' });
   }
-});
-
-app.get('/settings', (req, res) => {
-  res.render('settings', {
-    title: 'Settings',
-    description: 'Adjust your settings here.'
-  });
 });
 
 app.use(express.json());

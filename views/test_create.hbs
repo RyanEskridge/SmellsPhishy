@@ -2,10 +2,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js "></script>
+    <link href=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css " rel="stylesheet">
+    <script src=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js "></script>
+    <link href=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css " rel="stylesheet">
     <title>{{title}}</title>
     <style>
         .small-input {
-            width: 150px;
+            width: 300px;
+            width: 300px;
         }
     </style>
 </head>
@@ -15,13 +20,23 @@
         <h1>{{title}}</h1>
         <p>{{description}}</p>
 
-        <form id="newTestForm">
+        <form id="newTestForm" class="col-8">
             <!-- Campaign ID as a hidden field -->
             <input type="hidden" name="camp_id" value="{{campId}}">
 
             <div class="mb-3">
                 <label for="title" class="form-label">Test Title</label>
                 <input type="text" id="title" name="title" class="form-control" placeholder="Enter test title" required>
+            </div>
+
+            <div class="mb-3" id="clickOption">
+                <label for="targetList" class="form-label">Click Behavior</label>
+                <select class="form-control" id="option" name="option">
+                    <option value="" selected disabled>Select an option</option>
+                    <option value="0">Default Page</option>
+                    <option value="1">Redirect (Custom link)</option>
+                    <option value="2">404</option>
+                </select>
             </div>
 
             <div class="mb-3">
@@ -36,8 +51,8 @@
 
             <div class="mb-3" id="targetListArea">
                 <label for="targetList" class="form-label">Target List</label>
-                <select class="form-control" id="targetList" name="targetList">
-                    <option value="" selected disabled>SELECT</option>
+                <select class="form-control select2" id="targetList" name="targetList">
+                    <option value="" selected disabled>Select a target list</option>
                     {{#each targetLists}}
                     <option value="{{this.id}}">{{this.ListName}}</option>
                     {{/each}}
@@ -46,25 +61,29 @@
 
             <div class="mb-3" id="individualEmailArea" style="display: none;">
                 <label for="individualEmail" class="form-label">Individual Email</label>
-                <input type="email" class="form-control" id="individualEmail" name="individualEmail"
-                    placeholder="Enter email">
+                {{!-- <input type="email" class="form-control" id="individualEmail" name="individualEmail"
+                    placeholder="Enter email"> --}}
+                <!-- Replaced text input with SELECT to guarantee target exists and simplify TestTarget -->
+                <select class="form-control select2" id="individualEmail" name="individualEmail">
+                    <option value="" selected disabled>Select a single target</option>
+                    {{#each targets}}
+                        <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
+                            {{EmailAddress}}
+                        </option>
+                    {{/each}}
+                </select>
             </div>
 
             <div class="mb-3">
                 <label for="emailTemplate" class="form-label">Email Template</label>
-                <select class="form-control" id="emailTemplate" name="template_id" required>
-                    <option value="" selected>Custom Content</option>
+                <select class="form-control select2" id="emailTemplate" name="template_id" required>
+                    {{!-- <option value="custom" selected>Custom Content</option> --}}
                     {{#each emailTemplates}}
                     <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}">
                         {{this.name}}
                     </option>
                     {{/each}}
                 </select>
-            </div>
-
-            <div class="mb-3" id="customContentArea">
-                <label for="customContent" class="form-label">Custom Content</label>
-                <textarea class="form-control" id="customContent" name="customContent" rows="5"></textarea>
             </div>
 
             <div class="mt-4" id="templatePreview" style="display: none;">
@@ -84,26 +103,61 @@
         </form>
     </div>
 
-    <script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Select2
+        $('.select2').select2({
+            width: '100%',
+            placeholder: 'Search or select an option',
+            allowClear: true
+        });
+
+        const targetListArea = document.getElementById('targetListArea');
+        const individualEmailArea = document.getElementById('individualEmailArea');
+        const customContentArea = document.getElementById('customContentArea');
+        const emailTemplate = document.getElementById('emailTemplate');
+        const templatePreview = document.getElementById('templatePreview');
+        const templateSubject = document.getElementById('templateSubject');
+        const templateBody = document.getElementById('templateBody');
+        const targetListSelect = document.getElementById('targetList');
+        const individualEmailSelect = document.getElementById('individualEmail');
+        const targetTypeRadios = document.querySelectorAll('input[name="targetType"]');
+
         // Handle target type toggle
-        document.querySelectorAll('input[name="targetType"]').forEach((elem) => {
-            elem.addEventListener('change', function () {
-                const targetListArea = document.getElementById('targetListArea');
-                const individualEmailArea = document.getElementById('individualEmailArea');
-                if (this.value === 'list') {
-                    targetListArea.style.display = 'block';
-                    individualEmailArea.style.display = 'none';
+        targetTypeRadios.forEach((elem) => {
+            elem.addEventListener('change', () => {
+                const isList = elem.value === 'list';
+                targetListArea.style.display = isList ? 'block' : 'none';
+                individualEmailArea.style.display = isList ? 'none' : 'block';
+
+                if (isList) {
+                    individualEmailSelect.value = ''; // Clear individual email selection
+                    $(individualEmailSelect).trigger('change');
                 } else {
-                    targetListArea.style.display = 'none';
-                    individualEmailArea.style.display = 'block';
+                    targetListSelect.value = ''; // Clear target list selection
+                    $(targetListSelect).trigger('change');
                 }
             });
         });
 
+        // Update template preview visibility
+        const updateTemplatePreview = () => {
+            const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
+            const templateId = selectedOption.value;
+
+            templatePreview.style.display = 'block';
+            templateSubject.textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+            templateBody.textContent = selectedOption.getAttribute('data-body') || 'N/A';
+        };
+
+
+        // Initialize template preview
+        updateTemplatePreview();
+
         // Handle email template change
-        document.getElementById('emailTemplate').addEventListener('change', function () {
-            const customContentArea = document.getElementById('customContentArea');
-            customContentArea.style.display = this.value ? 'none' : 'block';
+        $('#emailTemplate').on('change.select2', () => {
+            
+            updateTemplatePreview();
         });
 
         // Form submission handler
@@ -112,9 +166,19 @@
 
             const formData = new FormData(event.target);
 
+            const targetType = formData.get('targetType');
+            if (targetType === 'list') {
+                const listId = document.getElementById('targetList').value;
+                if (!listId) {
+                    alert('Please select a target list.');
+                    return;
+                }
+                formData.set('list_id', listId);
+            }
+
             // Prepare payload
             const payload = Object.fromEntries(formData.entries());
-
+            console.log('Payload:', payload);
             try {
                 const response = await fetch('/tests/create', {
                     method: 'POST',
@@ -133,43 +197,6 @@
                 alert('An error occurred while creating the test.');
             }
         });
-    </script>
-
-    <script>
-        document.getElementById('emailTemplate').addEventListener('change', function () {
-            const customContentArea = document.getElementById('customContentArea');
-            if (this.value === "") {
-                customContentArea.style.display = 'block'; // Show the text box for Custom Content
-            } else {
-                customContentArea.style.display = 'none'; // Hide the text box
-            }
-        });
-    </script>
-
-    <script>
-        const emailTemplateSelect = document.getElementById('emailTemplate');
-        const customContentArea = document.getElementById('customContentArea');
-        const templatePreview = document.getElementById('templatePreview');
-        const templateSubject = document.getElementById('templateSubject');
-        const templateBody = document.getElementById('templateBody');
-
-        emailTemplateSelect.addEventListener('change', function () {
-            const selectedOption = this.options[this.selectedIndex];
-
-            if (this.value === "") {
-                // Show custom content area, hide template preview
-                customContentArea.style.display = 'block';
-                templatePreview.style.display = 'none';
-            } else {
-                // Hide custom content area, show template preview
-                customContentArea.style.display = 'none';
-                templatePreview.style.display = 'block';
-
-                // Update template preview
-                templateSubject.textContent = selectedOption.dataset.subject || "N/A";
-                templateBody.textContent = selectedOption.dataset.body || "N/A";
-            }
-        });
-    </script>
-
+    });
+</script>
 </body>

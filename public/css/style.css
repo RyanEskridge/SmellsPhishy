@@ -164,3 +164,11 @@ li.breadcrumb-item a {
     font-size: smaller;
     font-style: italic;
   }
+
+.card-body {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 9rem;
+}

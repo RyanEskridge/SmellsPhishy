@@ -1,12 +1,11 @@
 const { DataTypes } = require('sequelize');
-//const Targets = require('./Targets')
-//const Tests = require('./Tests')
+const { v4: uuidv4 } = require('uuid');
 const sequelize = require('../config/database');
 
-const TargetTests = sequelize.define('TargetTests', {
+const TestTargets = sequelize.define('TestTargets', {
     id: {
-        type: DataTypes.UUID,
-        defaultValue: () => uuidv4(),
+        type: DataTypes.INTEGER, // Change to INTEGER to match database schema
+        autoIncrement: true,
         primaryKey: true,
         allowNull: false
     },
@@ -32,4 +31,4 @@ const TargetTests = sequelize.define('TargetTests', {
     }
 }, { timestamps: false });
 
-module.exports = TargetTests;
+module.exports = TestTargets;

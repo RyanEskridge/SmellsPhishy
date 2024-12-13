@@ -1,58 +1,56 @@
 {{> breadcrumbs }}
-<h1 class="mx-2">Managing Campaign: {{campaign.name}}</h1>
-<p class="mx-2">Notes: {{campaign.notes}}</p>
+<h1 class="">Managing Campaign: {{campaign.name}}</h1>
+<p class="">Notes: {{campaign.notes}}</p>
 
 <!-- Row of Buttons -->
-<div class="button-row mx-2">
-    <button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit info" data-bs-toggle="modal"
-        data-bs-target="#editInfoModal">Edit Campaign Info</button>
-    <a href="/tests/create?camp_id={{campaign.id}}" class="btn btn-primary">
-        Create New Test
-    </a>
-    <button id="toggleStatusButton" class="btn btn-warning" data-campaign-id="{{campaign.id}}">
-        Toggle Status
-    </button>
+<div class="button-row">
+  <button type="button" class="btn btn-secondary mx-2" data-function="edit" title="edit info" data-bs-toggle="modal"
+    data-bs-target="#editInfoModal">Edit Campaign Info</button>
+  <a href="/tests/create?camp_id={{campaign.id}}" class="btn btn-primary">
+    Create New Test
+  </a>
+  <button id="toggleStatusButton" class="btn btn-warning" data-campaign-id="{{campaign.id}}">
+    Toggle Status
+  </button>
 </div>
-
-<!-- Tests Table -->
 
 <!-- Edit Info Modal -->
 <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title" id="editModalLabel"><i class=""></i>Edit Campaign Info</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="editModalLabel"><i class=""></i>Edit Campaign Info</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editInfoForm">
+          <input type="hidden" id="editTargetId" name="id">
+          <div class="mb-3">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Campaign Name</span>
+              <input type="text" class="form-control" name="name" required value="{{campaign.name}}">
             </div>
-            <div class="modal-body">
-                <form id="editInfoForm">
-                    <input type="hidden" id="editTargetId" name="id">
-                    <div class="mb-3">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Campaign Name</span>
-                            <input type="text" class="form-control" name="name" required value="{{campaign.name}}">
-                        </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Notes</span>
-                            <input type="text" class="form-control" name="notes" value="{{campaign.notes}}">
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-dark" style="width: 180px;">Edit Campaign</button>
-                        </div>
-                    </div>
-                </form>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Notes</span>
+              <input type="text" class="form-control" name="notes" value="{{campaign.notes}}">
             </div>
-        </div>
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-dark" style="width: 180px;">Edit Campaign</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="status mx-2 mt-3">
-    <p>
-        Status:
-        <strong id="statusText" class="{{#if campaign.status}}text-success{{else}}text-danger{{/if}}">
-            {{#if campaign.status}}Active{{else}}Inactive{{/if}}
-        </strong>
-    </p>
+<div class="status mt-3">
+  <p>
+    Status:
+    <strong id="statusText" class="{{#if campaign.status}}text-success{{else}}text-danger{{/if}}">
+      {{#if campaign.status}}Active{{else}}Inactive{{/if}}
+    </strong>
+  </p>
 </div>
 
 
@@ -61,70 +59,204 @@
 <p class="small-italic">Created: {{campaign.createdAt}}</p>
 <p class="small-italic">Updated: {{campaign.updatedAt}}</p>
 
+
+<!-- Tests Table -->
+<div class="my-5">
+<h4>Tests</h4>
+<hr>
+{{#if tests}}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">ID</th>
+      <th scope="col">Owner</th>
+      <th scope="col">Status</th>
+      <th scope="col">Targets</th>
+      <th scope="col">Delete</th>
+      <th scope="col">Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+{{#each tests}}
+    <tr>
+        <td>{{ title }}</td>
+        <td>{{ id }}</td>
+        <td>{{ owner }}</td>
+        <td>
+            {{#if status}}
+            <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}" checked>
+            </div>
+            {{else}}
+            <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" data-test-id="{{id}}">
+            </div>
+            {{/if}}
+        </td>
+        <td>{{targetCount}}</td>
+        <td>
+            <button data-test-id="{{id}}" class="delete-test btn brand-btn"><i class="bi bi-trash3"></i></button>
+        </td>
+        <td>
+            <button class="btn btn-secondary" onclick="window.location.href='/tests/edit/{{this.id}}'">
+                <i class="bi bi-pen"></i>
+            </button>
+        </td>
+        </tr>
+{{/each}}
+  </tbody>
+</table>
+</div>
+{{else}}
+<p>No tests currently.</p>
+{{/if}}
+
+<!-- Clicks Tables -->
+<h4 class="my-4">Clicks</h4>
+<hr>
+{{#if results.length}}
+{{#each results}}
+  {{#if this.targets.length}}<h5 style="margin-top:30px;">{{testTitle}}</h5>{{/if}}
+  {{#if this.targets.length}}
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Department</th>
+      <th scope="col">Supervisor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each this.targets}}
+    <tr>
+        <td>{{ this.name }}</td>
+        <td>{{ this.email }}</td>
+        <td>{{ this.department }}</td>
+        <td>{{ this.supervisor }}</td>
+    </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  {{/if}}
+{{/each}}
+{{else}}
+  <p>No clicks.</p>
+{{/if}}
+
+
 <script>
-    document.getElementById('editInfoForm').addEventListener('submit', async function (event) {
-        event.preventDefault();
+  document.getElementById('editInfoForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-        const campaignId = "{{campaign.id}}"; // Use the current campaign's ID
-        const formData = new FormData(event.target);
-        const payload = Object.fromEntries(formData.entries());
+    const campaignId = "{{campaign.id}}"; // Use the current campaign's ID
+    const formData = new FormData(event.target);
+    const payload = Object.fromEntries(formData.entries());
 
-        try {
-            const response = await fetch(`/campaigns/${campaignId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
+    try {
+      const response = await fetch(`/campaigns/${campaignId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-            if (response.ok) {
-                const newName = payload.name;
-                const newNotes = payload.notes;
+      if (response.ok) {
+        const newName = payload.name;
+        const newNotes = payload.notes;
 
-                document.querySelector('h1').textContent = `Managing Campaign: ${newName}`;
-                document.querySelector('p').textContent = `Notes: ${newNotes}`;
+        document.querySelector('h1').textContent = `Managing Campaign: ${newName}`;
+        document.querySelector('p').textContent = `Notes: ${newNotes}`;
 
-                const editInfoModal = document.querySelector('#editInfoModal');
-                const modalInstance = bootstrap.Modal.getInstance(editInfoModal);
-                modalInstance.hide();
-            } else {
-                console.error('Failed to update campaign:', response.statusText);
-                alert('Error updating campaign info.');
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('An error occurred while updating the campaign.');
-        }
-    });
+        const editInfoModal = document.querySelector('#editInfoModal');
+        const modalInstance = bootstrap.Modal.getInstance(editInfoModal);
+        modalInstance.hide();
+      } else {
+        console.error('Failed to update campaign:', response.statusText);
+        alert('Error updating campaign info.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('An error occurred while updating the campaign.');
+    }
+  });
 </script>
 
 <script>
-    document.getElementById('toggleStatusButton').addEventListener('click', async function () {
-        const campaignId = this.dataset.campaignId;
-        try {
-            const response = await fetch(`/campaigns/toggle-status/${campaignId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+  document.getElementById('toggleStatusButton').addEventListener('click', async function () {
+    const campaignId = this.dataset.campaignId;
+    try {
+      const response = await fetch(`/campaigns/toggle-status/${campaignId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-            if (response.ok) {
-                const data = await response.json();
-                const statusText = data.status ? 'Active' : 'Inactive';
-                const statusClass = data.status ? 'text-success' : 'text-danger';
+      if (response.ok) {
+        const data = await response.json();
+        const statusText = data.status ? 'Active' : 'Inactive';
+        const statusClass = data.status ? 'text-success' : 'text-danger';
 
-                const statusElement = document.getElementById('statusText');
-                statusElement.textContent = statusText;
-                statusElement.className = statusClass;
-            } else {
-                console.error('Failed to toggle status:', response.statusText);
-                alert('Error toggling campaign status.');
-            }
-        } catch (error) {
-            console.error('Error toggling status:', error);
-            alert('An error occurred while toggling campaign status.');
-        }
+        const statusElement = document.getElementById('statusText');
+        statusElement.textContent = statusText;
+        statusElement.className = statusClass;
+      } else {
+        console.error('Failed to toggle status:', response.statusText);
+        alert('Error toggling campaign status.');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      alert('An error occurred while toggling campaign status.');
+    }
+  });
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleSwitches = document.querySelectorAll('.form-switch');
+
+   toggleSwitches.forEach(toggleSwitch => {
+    toggleSwitch.addEventListener('change', (event) => {
+      const testId = event.target.getAttribute('data-test-id'); 
+      const newStatus = event.target.checked; 
+
+      fetch(`/tests/update/status/${testId}`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update status');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Status updated:', data);
+        })
+        .catch(error => {
+          console.error('Error updating status:', error);
+        });
     });
+   });
+});
+
+
+document.querySelectorAll('.delete-test').forEach(button => {
+  button.addEventListener('click', function() {
+    const testId = this.getAttribute('data-test-id');
+    if (confirm('Are you sure you want to delete this test?')) {
+      fetch(`/tests/delete/${testId}`, { method: 'DELETE' })
+        .then(response => location.reload())
+        .catch(error => alert('Failed to delete list.'));
+    }
+  });
+});
+
 </script>

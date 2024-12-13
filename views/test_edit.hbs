@@ -1,0 +1,209 @@
+
+<head>
+    <!DOCTYPE html>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js "></script>
+    <link href=" https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css " rel="stylesheet">
+    <title>{{title}}</title>
+    <style>
+        .small-input {
+            width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1>{{title}}</h1>
+        <p>{{description}}</p>
+
+        <form id="newTestForm" class="col-8 px-0">
+            <!-- Campaign ID as a hidden field -->
+            <input type="hidden" name="testId" value="{{test.id}}">
+            <input type="hidden" name="camp_id" value="{{test.camp_id}}">
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Test Title</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{test.title}}"placeholder="Enter test title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Target Type</label>
+                <div>
+                    <input type="radio" id="targetListOption" name="targetType" value="list" checked>
+                    <label for="targetListOption">Target List</label>
+                    <input type="radio" id="individualOption" name="targetType" value="individual">
+                    <label for="individualOption">Individual</label>
+                </div>
+            </div>
+
+            <div class="mb-3" id="targetListArea">
+                <label for="targetList" class="form-label">Target List</label>
+                <select class="form-control select2" id="targetList" name="targetList">
+                    <option value="">SELECT</option>
+                    {{#each targetLists}}
+                        <option value="{{this.id}}" {{#if (eq ../test.list_id this.id)}}selected{{/if}}>
+                            {{this.ListName}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+
+
+            <div class="mb-3" id="individualEmailArea" style="display: none;">
+                <label for="individualEmail" class="form-label">Individual Email</label>
+                <select class="form-control select2" id="individualEmail" name="individualEmail">
+                    <option value="" disabled {{#unless test.individualEmail}}selected{{/unless}}>SELECT</option>
+                    {{#each targets}}
+                        <option value="{{this.id}}" {{#if (eq ../test.individualEmail this.id)}}selected{{/if}}>
+                            {{EmailAddress}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+
+
+            <div class="mb-3">
+                <label for="emailTemplate" class="form-label">Email Template</label>
+                <select class="form-control select2" id="emailTemplate" name="template_id" required>
+                   {{!-- <option value="custom" data-subject="" data-body="">Custom Content</option> --}}
+                    {{#each emailTemplates}}
+                        <option value="{{this.id}}" data-subject="{{this.subject}}" data-body="{{this.body}}" 
+                            {{#if (eq ../test.template_id this.id)}}selected{{/if}}>
+                            {{this.name}}
+                        </option>
+                    {{/each}}
+                </select>
+            </div>
+
+
+            <div class="mt-4" id="templatePreview" style="display: none;">
+                <h4>Template Preview</h4>
+                <p><strong>Subject:</strong> <span id="templateSubject"></span></p>
+                <p><strong>Body:</strong></p>
+                <pre id="templateBody" style="background: #f8f9fa; padding: 10px; border: 1px solid #ddd;"></pre>
+            </div>
+
+            <div class="mb-3">
+                <label for="scheduledTime" class="form-label">Scheduled Time</label>
+                <input
+                    type="datetime-local"
+                    class="form-control form-control-sm small-input"
+                    id="scheduledTime"
+                    name="scheduledTime"
+                    value="{{test.scheduled_time}}"
+                    required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update Test</button>
+        </form>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Select2
+    $('.select2').select2({
+        width: '100%',
+        placeholder: 'Search or select an option',
+        allowClear: true
+    });
+
+    const testData = {
+        listId: "{{test.list_id}}",
+        individualEmail: "{{test.individualEmail}}",
+    };
+
+    const targetListArea = document.getElementById('targetListArea');
+    const targetListSelect = document.getElementById('targetList');
+    const individualEmailArea = document.getElementById('individualEmailArea');
+    const individualEmailSelect = document.getElementById('individualEmail');
+    const targetTypeRadios = document.querySelectorAll('input[name="targetType"]');
+
+    // Preselect based on the test's targetType
+    const targetType = testData.listId ? 'list' : 'individual';
+    console.log(testData)
+    console.log(targetType)
+
+    if (targetType === 'list') {
+        document.getElementById('targetListOption').checked = true;
+        targetListArea.style.display = 'block';
+        individualEmailArea.style.display = 'none';
+    } else {
+        document.getElementById('individualOption').checked = true;
+        targetListArea.style.display = 'none';
+        individualEmailArea.style.display = 'block';
+    }
+
+    // Handle target type toggle
+    targetTypeRadios.forEach((elem) => {
+        elem.addEventListener('change', () => {
+            const isList = elem.value === 'list';
+            targetListArea.style.display = isList ? 'block' : 'none';
+            individualEmailArea.style.display = isList ? 'none' : 'block';
+
+            if (isList) {
+                individualEmailSelect.value = ''; // Clear individual email selection
+                $(individualEmailSelect).trigger('change');
+            } else {
+                targetListSelect.value = ''; // Clear target list selection
+                $(targetListSelect).trigger('change');
+            }
+        });
+    });
+
+    // Update template preview visibility
+    const updateTemplatePreview = () => {
+        const emailTemplate = document.getElementById('emailTemplate');
+        const selectedOption = emailTemplate.options[emailTemplate.selectedIndex];
+        const templateId = selectedOption.value;
+
+        document.getElementById('templatePreview').style.display = 'block';
+        document.getElementById('templateSubject').textContent = selectedOption.getAttribute('data-subject') || 'N/A';
+        document.getElementById('templateBody').textContent = selectedOption.getAttribute('data-body') || 'N/A';
+    };
+
+    updateTemplatePreview();
+
+    $('#emailTemplate').on('change.select2', updateTemplatePreview);
+
+    // Handle form submission
+    document.getElementById('newTestForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const testId = formData.get('testId');
+        const targetType = formData.get('targetType');
+
+        if (targetType === 'list') {
+            const listId = targetListSelect.value;
+            if (!listId) {
+                alert('Please select a target list.');
+                return;
+            }
+            formData.set('list_id', listId);
+        }
+
+        const payload = Object.fromEntries(formData.entries());
+        try {
+            const response = await fetch(`/tests/update/${testId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+                alert('Test updated successfully!');
+                window.location.href = `/campaigns/manage/${payload.camp_id}`;
+            } else {
+                alert('Failed to update test.');
+            }
+        } catch (error) {
+            console.error('Error updating test:', error);
+            alert('An error occurred while updating the test.');
+        }
+    });
+});
+</script>
+
+</body>

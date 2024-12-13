@@ -2,6 +2,15 @@
 
 A simple cyber security tool that enables IT admins to test their users' suseptibility to phishing attacks.
 
+# How to run
+1. Install NodeJS if it's not installed already.
+2. Git clone the GH project onto your local machine 
+3. Open it in VSCode 
+4. Run 'npm install' from the project directory to install the project's dependencies
+5. If nodemon is installed run 'nodemon app.js' to start the local server. If nodemon isn't installed, run 'node app.js' instead.
+6. Open a browser and navigate to 'localhost:8080' and the site should be running locally
+
+
 ### Technology Stack
 
 ---

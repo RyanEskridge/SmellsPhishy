@@ -4,6 +4,8 @@ const EmailTemplate = require('./EmailTemplate');
 const Campaigns = require('./Campaigns')
 const sequelize = require('../config/database');
 
+const Lists = require('./Lists');
+
 const Tests = sequelize.define(
     'Tests',
     {
@@ -31,6 +33,22 @@ const Tests = sequelize.define(
                 model: EmailTemplate,
                 key: 'id'
             },
+            allowNull: false
+        },
+        list_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: Lists,
+                key: 'id'
+            },
+        },
+        scheduled_time: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        option: {
+            type: DataTypes.STRING,
             allowNull: false
         },
         owner: {
