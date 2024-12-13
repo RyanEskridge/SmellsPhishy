@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns } = require('../models');
-//const { clerkClient } = require('@clerk/express');
 const sequelize = require('../config/database');
 
 router.get('/create', async (req, res) => {
@@ -80,7 +79,6 @@ router.post('/create', async (req, res) => {
           }
 
           await TestTargets.create(testTarget);
-          console.log(individualEmail);
         }
       
         // Handle custom content if provided
@@ -100,8 +98,7 @@ router.post('/create', async (req, res) => {
 router.put('/update/status/:id', async (req, res) => {
     const testId = req.params.id; 
     const { status } = req.body;
-    // console.log(`ID: ${testId}`)
-    // console.log(`status: ${status}`)
+
     try {
       const test = await Tests.findByPk(testId);
   
@@ -165,12 +162,8 @@ router.put('/update/status/:id', async (req, res) => {
             return res.status(404).send('Test not found');
         }
 
-        //console.log('Test:', test.get({ plain: true }));
-
         const targetCount = test.get('targetCount');
         let individualEmail = null;
-
-        //console.log('Target Count:', targetCount);
 
         if (targetCount === 1) {
             // Fetch the single associated target
@@ -182,14 +175,10 @@ router.put('/update/status/:id', async (req, res) => {
                 },
             });
 
-            //console.log('Single Target:', singleTarget?.get({ plain: true }));
-
             if (singleTarget) {
                 individualEmail = singleTarget.id;
             }
         }
-
-        //console.log('Individual Email:', individualEmail);
 
         // Fetch related data
         const targetLists = await Lists.findAll();
@@ -234,8 +223,6 @@ router.put('/update/:id', async (req, res) => {
 
     // Clear previous test targets
     await TestTargets.destroy({ where: { testId } });
-    //console.log('Target List: ', targetList)
-    //console.log('Individual: ', individualEmail)
 
     // Handle Target List
     if (targetList) {

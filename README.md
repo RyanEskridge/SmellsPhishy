@@ -3,13 +3,16 @@
 A simple cyber security tool that enables IT admins to test their users' suseptibility to phishing attacks.
 
 # How to run
-1. Install NodeJS if it's not installed already.
-2. Git clone the GH project onto your local machine 
-3. Open it in VSCode 
-4. Run 'npm install' from the project directory to install the project's dependencies
-5. If nodemon is installed run 'nodemon app.js' to start the local server. If nodemon isn't installed, run 'node app.js' instead.
-6. Open a browser and navigate to 'localhost:8080' and the site should be running locally
+1. If not installed already, install NodeJS.
+`https://nodejs.org/en/download/package-manager/current`
+2. Git clone the project onto your local machine.
+`https://github.com/RyanEskridge/SmellsPhishy.git`
+3. Open it in VSCode or the editor of your choice. 
+4. Run `npm install` from the project directory to install the project's dependencies.
+5. To start the app run `node app.js`. Alternatively, `nodemon` if it is installed.
+6. Open a browser and navigate to `localhost:8080` and the site should be running locally.
 
+Note: Files with sample data can be found in the `presentation` folder.
 
 ### Technology Stack
 

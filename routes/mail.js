@@ -4,8 +4,6 @@ const { EmailTemplate, Targets, Lists, Tests, TestTargets, Campaigns, GlobalSett
 const { sendMail, massMailer } = require('../helpers/mailHandler');
 const { clerkClient } = require('@clerk/express');
 
-console.log();
-
 router.post('/send-email', (req, res) => {
   sendMail(req, res);
 });
@@ -24,7 +22,7 @@ try {
     for (const test of tests) {
         const scheduledTime = new Date(test.scheduled_time).getTime();
         
-        // Check if the test is within the last 24 hours
+        // Check if the test is within the last 24 hours 
         if (true || currentTime - scheduledTime <= oneDay) {
             // Get the full EmailTemplate for this test
             const emailTemplate = await EmailTemplate.findOne({
@@ -61,16 +59,14 @@ try {
             const local = "http://localhost:8080";
             const remote = "https://mediocresolutions.com";
             const compositeUrl = `${local}/click/${result.option}/${result.testId}/${target.id}`;
-            console.log(compositeUrl);
             const data = {
                 "target.name": `${target.FirstName} ${target.LastName}`,
                 "company.name": plainSettings.CompanyName,
                 company: plainSettings.CompanyName,
                 link: compositeUrl,
             };
-            // console.log(target.EmailAddress)
+
             const updatedBody = templateBody.replace(/{([^}]+)}/g, (_, key) => data[key] || `{${key}}`);
-            
             massMailer(from, target.EmailAddress, templateSubject, updatedBody, updatedBody);
 
             function delay(ms) {
