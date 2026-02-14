@@ -1,6 +1,8 @@
 # Smells Phishy
 
-A simple cyber security tool that enables IT admins to test their users' suseptibility to phishing attacks.
+## If it wasn't obvious, this project is not maintained and will probably expose you to who a million vulnerabilities.
+
+A simple cybersecurity tool that enables IT admins to test their users' susceptibility to phishing attacks.
 
 # How to run
 1. If not installed already, install NodeJS.
@@ -9,8 +11,8 @@ A simple cyber security tool that enables IT admins to test their users' susepti
 `https://github.com/RyanEskridge/SmellsPhishy.git`
 3. Open it in VSCode or the editor of your choice. 
 4. Run `npm install` from the project directory to install the project's dependencies.
-5. To start the app run `node app.js`. Alternatively, `nodemon` if it is installed.
-6. Open a browser and navigate to `localhost:8080` and the site should be running locally.
+5. To start the app, run `node app.js`. Alternatively, `nodemon` if it is installed.
+6. Open a browser and navigate to `localhost:8080,` and the site should be running locally.
 
 Note: Files with sample data can be found in the `presentation` folder.
 
@@ -30,7 +32,7 @@ Note: Files with sample data can be found in the `presentation` folder.
 _Cloudflare_: You'll need to add your IP address to the whitelist. You can find it here:
 Security > WAF > Custom Rules > IP Whitelist > Add your IP to the value box
 
-_Clerk_: All pages are authenticated other than those in the `public` folder namely the login and signup pages.
+_Clerk_: All pages are authenticated, other than those in the `public` folder, namely the login and signup pages.
 
 ### Routes
 
@@ -73,7 +75,7 @@ app.get('/settings', (req, res) => {
 
 ```
 
-Now, lets look further into one of the more involved routes.
+Now, let's look further into one of the more involved routes.
 
 ```JavaScript
 // File: app.js
